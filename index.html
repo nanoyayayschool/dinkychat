@@ -22,6 +22,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body, html { width: 100%; height: 100%; background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; }
 
+        html[data-theme="midnight"] { --bg-dark:#080b14; --bg-panel:#0d1220; --bg-surface:#121a2b; --bg-input:#182238; --bg-hover:#26334f; }
         .hidden { display: none !important; }
 
         /* --- AUTH SCREEN --- */
@@ -210,26 +211,24 @@
         // --- AUTH & SETUP ---
         window.onload = () => {
             setupEmojiPicker();
+            try { document.documentElement.dataset.theme = JSON.parse(localStorage.getItem("dinky_theme") || "\"dark\""); } catch (_) {}
             const savedSession = localStorage.getItem("dinky_session");
-            const settings = JSON.parse(localStorage.getItem("dinky_settings") || '{"auto_login": true}');
-            
+            let settings = { auto_login: true };
+            try { settings = JSON.parse(localStorage.getItem("dinky_settings") || '{"auto_login":true}'); } catch (_) {}
             if (savedSession && settings.auto_login) {
-                session = JSON.parse(savedSession);
-                startApp();
+                try { session = JSON.parse(savedSession); if (session && session.username && session.token) startApp(); }
+                catch (_) { localStorage.removeItem("dinky_session"); }
             }
         };
 
-        async function api(endpoint, payload) {
+        async function api(endpoint, payload = {}) {
             try {
-                const res = await fetch(`${BASE_URL}/${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                return await res.json();
-            } catch (e) {
-                return { status: "error", message: `Connection error: ${e}` };
-            }
+                const res = await fetch(`${BASE_URL}/${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const type = res.headers.get('content-type') || '';
+                const data = type.includes('application/json') ? await res.json() : { status: res.ok ? 'success' : 'error', message: await res.text() };
+                if (!res.ok && data.status !== 'error') data.status = 'error';
+                return data;
+            } catch (e) { return { status: 'error', message: `Connection error: ${e.message || e}` }; }
         }
 
         async function attemptLogin() {
@@ -440,14 +439,19 @@
         function showContextMenu(e, sender, text, msgId, isOwner) {
             e.preventDefault();
             const menu = document.getElementById('context-menu');
-            menu.style.left = `${e.pageX}px`;
-            menu.style.top = `${e.pageY}px`;
-            
-            let html = `<div class="context-menu-item" onclick="setReplyTarget('${sender}', '${text}'); hideContextMenu();">Reply</div>`;
+            menu.style.left = `${Math.min(e.pageX, window.innerWidth - 190)}px`;
+            menu.style.top = `${Math.min(e.pageY, window.innerHeight - 100)}px`;
+            menu.innerHTML = '';
+            const replyItem = document.createElement('div');
+            replyItem.className = 'context-menu-item'; replyItem.innerText = 'Reply';
+            replyItem.onclick = () => { setReplyTarget(sender, text); hideContextMenu(); };
+            menu.appendChild(replyItem);
             if (sender === session.username || isOwner) {
-                html += `<div class="context-menu-item" style="color:var(--accent-red);" onclick="deleteMessage(${msgId}); hideContextMenu();">Delete Message</div>`;
+                const deleteItem = document.createElement('div');
+                deleteItem.className = 'context-menu-item'; deleteItem.style.color = 'var(--accent-red)'; deleteItem.innerText = 'Delete Message';
+                deleteItem.onclick = () => { deleteMessage(msgId); hideContextMenu(); };
+                menu.appendChild(deleteItem);
             }
-            menu.innerHTML = html;
             menu.classList.remove('hidden');
         }
 
@@ -523,7 +527,7 @@
         }
 
         function toggleEmoticons() { document.getElementById('emoji-picker').classList.toggle('hidden'); }
-        function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+        function escapeHTML(str) { return String(str ?? '').replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
 
         async function promptCreateServer() {
             const name = prompt("Enter Server Name:");
@@ -541,6 +545,37 @@
                 pollData();
             }
         }
+
+        // missing UI actions
+        function openDiscoveryModal() {
+            const list = (rawServers || []).map(s => `<button class="nav-btn" style="margin-bottom:6px;background:var(--bg-input);" onclick="joinServerFromDiscovery(${Number(s.id)})"><span>🏠 ${escapeHTML(s.name || 'Unnamed server')}</span><span>${(s.members || []).length} members</span></button>`).join('') || `<div style="color:var(--text-sub);font-size:13px">No servers were returned.</div>`;
+            openModal(`<h3>🔍 Server Discovery</h3><div>${list}</div>`);
+        }
+        async function joinServerFromDiscovery(serverId) {
+            const res = await api('join_server',{username:session.username,token:session.token,server_id:serverId});
+            alert(res.message || (res.status === 'success' ? 'Joined server!' : 'Could not join server.'));
+            if(res.status === 'success'){ closeModal(); await pollData(); }
+        }
+        function openRequestsModal() {
+            const list=(pendingRequests||[]).map((r,i)=>{const from=typeof r==='string'?r:(r.username||r.from||r.sender||'Unknown');return `<div style="background:var(--bg-input);padding:10px;border-radius:6px;margin-bottom:7px"><b>@${escapeHTML(from)}</b><div style="display:flex;gap:6px;margin-top:7px"><button class="btn-sm btn-primary" style="flex:1" onclick="respondFriendRequest(${i},true)">Accept</button><button class="btn-sm" style="flex:1;background:var(--accent-red);color:#111" onclick="respondFriendRequest(${i},false)">Decline</button></div></div>`}).join('') || `<div style="color:var(--text-sub);font-size:13px">No pending friend requests.</div>`;
+            openModal(`<h3>💬 Friend Requests</h3>${list}`);
+        }
+        async function respondFriendRequest(index,accept){
+            const r=pendingRequests[index]; const target=typeof r==='string'?r:(r&&(r.username||r.from||r.sender)); if(!target)return;
+            const res=await api(accept?'accept_friend_request':'decline_friend_request',{username:session.username,token:session.token,target});
+            alert(res.message || (res.status==='success'?(accept?'Request accepted!':'Request declined.'):'Request action failed.')); if(res.status==='success'){await pollData();openRequestsModal();}
+        }
+        function openSettingsModal(){
+            let s={auto_login:true}; try{s=JSON.parse(localStorage.getItem('dinky_settings')||'{"auto_login":true}')}catch(_){}
+            openModal(`<h3>⚙ Style & Settings</h3><div class="form-group"><label>Theme</label><select id="theme-select" style="width:100%;padding:9px;background:var(--bg-input);color:var(--text-main);border:0;border-radius:6px"><option value="dark">Dark</option><option value="midnight">Midnight</option></select></div><div class="checkbox-group"><input type="checkbox" id="settings-auto-login" ${s.auto_login?'checked':''}><label for="settings-auto-login">Auto Login on Startup</label></div><button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>`);
+        }
+        function saveSettings(){const auto=document.getElementById('settings-auto-login').checked;const theme=document.getElementById('theme-select').value;localStorage.setItem('dinky_settings',JSON.stringify({auto_login:auto}));localStorage.setItem('dinky_theme',JSON.stringify(theme));document.documentElement.dataset.theme=theme;closeModal();}
+        function openServerSettings(){const s=rawServers.find(x=>x.id===currentServerId);if(!s)return;openModal(`<h3>⚙ ${escapeHTML(s.name||'Server')} Settings</h3><div style="color:var(--text-sub);font-size:13px;margin-bottom:12px">Members: ${(s.members||[]).length}<br>Channels: ${(s.channels||['general']).length}</div><button class="btn btn-secondary" onclick="closeModal()">Close</button>`);}
+        async function deleteCurrentChannel(){
+            if(!currentServerId||!currentChannel.startsWith('server_'))return; const name=currentChannel.split('_').slice(2).join('_'); if(!confirm(`Delete #${name}?`))return;
+            const res=await api('delete_server_channel',{username:session.username,token:session.token,server_id:currentServerId,channel_name:name}); if(res.status==='success'){currentChannel='global';currentServerId=null;await pollData();switchChannel('global');}else alert(res.message||'Could not delete this channel.');
+        }
+        window.addEventListener('resize',()=>{hideContextMenu();document.getElementById('emoji-picker').classList.add('hidden');});
     </script>
 </body>
 </html>
