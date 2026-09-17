@@ -1,8 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
+<!DOCTYPE html>
+<html lang="en"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Dinky Chat — Web Edition</title>
 <style>
 :root{
@@ -16,8 +15,8 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow
 button,input{font:inherit}
 .hidden{display:none!important}
 button{cursor:pointer}
-#auth-screen{height:100vh;display:flex;align-items:center;justify-content:center}
-.auth-card{width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px #0008}
+#auth-screen{height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.auth-card{width:100%;max-width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px #0008}
 .auth-card h1{text-align:center;color:var(--purple);font-size:24px}
 .auth-card p{text-align:center;color:var(--sub);font-size:13px;margin:4px 0 20px}
 .form-group{margin-bottom:12px}.form-group label{display:block;font-size:12px;font-weight:700;color:#bac2de;margin-bottom:4px}
@@ -27,8 +26,8 @@ button{cursor:pointer}
 .btn{width:100%;padding:10px;border:0;border-radius:6px;font-weight:700;margin-bottom:8px}
 .primary{background:var(--purple);color:#11111b}.secondary{background:var(--panel);color:var(--text)}
 #error{height:16px;color:var(--red);font-size:12px;margin-bottom:10px}
-#app{display:flex;width:100vw;height:100vh}
-.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid #fff0a}
+#app{display:flex;width:100vw;height:100vh;position:relative;overflow:hidden}
+.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid #fff0a;transition:transform 0.25s ease;z-index:20}
 .search{padding:10px}.search input{width:100%;padding:7px 10px;background:var(--input);border:0;border-radius:4px;color:var(--text);outline:0}
 .scroll{flex:1;overflow:auto;padding:0 8px}.section{font-size:11px;font-weight:700;color:var(--purple);padding:8px 4px 4px;text-transform:uppercase}
 .nav{width:100%;border:0;border-radius:4px;background:transparent;color:var(--text);text-align:left;padding:8px 10px;font-size:13px;margin-bottom:2px}
@@ -37,7 +36,7 @@ button{cursor:pointer}
 .server-tools{display:flex;gap:4px;margin-bottom:6px}.small{padding:6px;border:0;border-radius:4px;font-size:11px;font-weight:700}
 .sidebar-actions{padding:8px;border-top:1px solid #fff1;display:flex;flex-direction:column;gap:4px}
 .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg),var(--surface))}
-.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff1}
+.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff1;gap:8px}
 .header-title{font-weight:700;color:var(--purple);font-size:16px}.header-status{font-size:11px;color:var(--sub);margin-left:10px}.actions{display:flex;gap:6px}
 .messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
 .msg{background:#0002;padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
@@ -46,7 +45,7 @@ button{cursor:pointer}
 .replybar{background:#2b2d31;padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}
 .inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}
 .inputbar textarea{flex:1;padding:10px;background:var(--input);border:0;border-radius:6px;color:var(--text);outline:0;resize:none;min-height:40px;max-height:120px;line-height:20px}
-.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid #fff1;padding:12px;overflow:auto}
+.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid #fff1;padding:12px;overflow:auto;transition:transform 0.25s ease;z-index:20}
 .member .section{padding-left:0}
 .emoji{position:absolute;bottom:60px;left:16px;background:var(--surface);border:1px solid var(--hover);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;box-shadow:0 4px 12px #0008}
 .modal-overlay{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:100}
@@ -60,24 +59,42 @@ button{cursor:pointer}
 .status{color:var(--green);font-size:12px;margin-bottom:10px}
 .bio{background:var(--input);padding:9px;border-radius:5px;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 hr{border:0;border-top:1px solid #fff1;margin:12px 0}
-@media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
+
+.mobile-toggle-btn{display:none}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:15}
+
+/* Mobile responsive styles */
+@media(max-width:768px){
+  .mobile-toggle-btn{display:inline-block}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;transform:translateX(-100%);box-shadow:4px 0 16px #0008}
+  .sidebar.open{transform:translateX(0)}
+  .member{position:fixed;top:0;right:0;bottom:0;width:240px;transform:translateX(100%);box-shadow:-4px 0 16px #0008}
+  .member.open{transform:translateX(0)}
+  .sidebar-overlay.active{display:block}
+  .actions{flex-wrap:wrap}
+  .actions button{padding:4px 8px;font-size:10px}
+  .header-title{font-size:14px}
+  .emoji{grid-template-columns:repeat(4,1fr);left:8px;right:8px;bottom:70px}
+}
 </style>
 </head>
 <body>
-<div id="auth-screen">
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="closeMobilePanels()"></div>
+
+<div id="auth-screen" class="hidden">
   <div class="auth-card">
     <h1>DINKY CHAT</h1><p>Sign in to start chatting</p>
     <div id="error"></div>
     <div class="form-group"><label>Username</label><input id="user"></div>
     <div class="form-group"><label>Password</label><input id="pass" type="password"></div>
-    <label class="checkbox"><input id="auto" type="checkbox" checked> Auto Login on Startup</label>
+    <label class="checkbox"><input id="auto" type="checkbox" checked=""> Auto Login on Startup</label>
     <button class="btn primary" onclick="login()">Log In</button>
     <button class="btn secondary" onclick="register()">Create Account</button>
   </div>
 </div>
 
-<div id="app" class="hidden">
-  <aside class="sidebar">
+<div id="app" class="">
+  <aside id="sidebar" class="sidebar">
     <div class="search"><input id="search" placeholder="Search..." oninput="renderSidebar()"></div>
     <div class="scroll">
       <div class="section">⚡ Channels</div>
@@ -88,32 +105,46 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
         <button class="small primary" style="flex:1" onclick="createServer()">+ Create</button>
         <button class="small" style="flex:1;background:var(--blue);color:#111" onclick="discover()">🔍 Discover</button>
       </div>
-      <div id="servers"></div>
+      <div id="servers"><div><div class="server-head">🏠 Test</div><button class="nav sub active"># general</button></div></div>
       <div class="section" style="display:flex;justify-content:space-between;align-items:center">
         <span>💬 Direct Messages</span><button id="reqs" class="small" style="background:var(--hover);color:var(--green)" onclick="requests()">Requests (0)</button>
       </div>
-      <div id="friends"></div>
+      <div id="friends"><button class="nav">💬 Eclipse</button><button class="nav">💬 Catmaster12139</button></div>
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style &amp; Settings</button>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
   <main class="chat">
-    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
-    <div id="messages" class="messages"></div>
-    <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
+    <header class="header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="small mobile-toggle-btn" style="background:var(--hover);color:var(--text)" onclick="toggleSidebar()">☰</button>
+        <div><span id="header" class="header-title">🏠 #general</span><span id="conn" class="header-status" style="color: var(--green);">● connected</span></div>
+      </div>
+      <div id="actions" class="actions">
+        <button class="small" style="background:var(--hover);color:var(--text)" onclick="serverSettings()">⚙ Settings</button>
+        <button class="small primary" onclick="createChannel()">+ Channel</button>
+        <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>
+        <button class="small mobile-toggle-btn" style="background:var(--hover);color:var(--text)" onclick="toggleMembers()">👥</button>
+      </div>
+    </header>
+    <div id="messages" class="messages" data-previous-scroll="0"><div class="msg"><div><span class="author" style="color: rgb(122, 74, 0);">dinky</span></div><div class="msgtext">heeloo</div></div></div>
+    <div id="replybar" class="replybar hidden"><span id="replytext">Replying to @Catmaster12139: "he"</span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
       <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
       <div id="emoji" class="emoji hidden"></div>
-      <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
+      <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)" style="height: 40px;"></textarea>
       <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
     </div>
   </main>
-  <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
+  <aside id="member" class="member"><div class="section">MEMBERS</div><div id="members"><div style="color:var(--sub);font-size:12px;padding:8px 4px">No members available.</div></div></aside>
 </div>
-<div id="overlay" class="modal-overlay hidden" onclick="closeModal(event)"><div id="modal" class="modal" onclick="event.stopPropagation()"></div></div>
+<div id="overlay" class="modal-overlay hidden" onclick="closeModal(event)"><div id="modal" class="modal" onclick="event.stopPropagation()"><h2>Discover — Servers &amp; People</h2>
+    <input id="discoverSearch" placeholder="Search...">
+    <h3>Servers</h3><div id="discoverServers"><div class="card"><span>Test</span><button class="small" style="background:var(--green);color:#111" onclick="joinServer(988c3b73)">Join</button></div></div>
+    <hr><h3>People</h3><div id="discoverPeople"><div class="card"><span>@Eclipse (Online)</span><button class="small primary" onclick="sendDiscover('Eclipse')">+ Add Friend</button></div><div class="card"><span>@Catmaster12139 (Online)</span><button class="small primary" onclick="sendDiscover('Catmaster12139')">+ Add Friend</button></div></div></div></div>
 
 <script>
 const BASE_URL="https://dinky476.pythonanywhere.com";
@@ -124,6 +155,25 @@ let connected=false;
 let profileCache={};
 let globalMemberUsers=[];
 let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe UI",avatar_color:"#89B4FA",banner_color:"#313244"};
+
+function isMobile(){return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);}
+function toggleSidebar(){
+  const sb = $("sidebar"), overlay = $("sidebar-overlay");
+  const isOpen = sb.classList.contains("open");
+  closeMobilePanels();
+  if(!isOpen){ sb.classList.add("open"); overlay.classList.add("active"); }
+}
+function toggleMembers(){
+  const mb = $("member"), overlay = $("sidebar-overlay");
+  const isOpen = mb.classList.contains("open");
+  closeMobilePanels();
+  if(!isOpen){ mb.classList.add("open"); overlay.classList.add("active"); }
+}
+function closeMobilePanels(){
+  $("sidebar").classList.remove("open");
+  $("member").classList.remove("open");
+  $("sidebar-overlay").classList.remove("active");
+}
 
 function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
 async function api(endpoint,data){
@@ -142,7 +192,7 @@ function setConnection(ok,label){
 }
 function autoGrow(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
 function messageKeydown(e){
-  if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
+  if(e.key==="Enter" && (e.ctrlKey || (!e.shiftKey && !isMobile()))){e.preventDefault();send();}
 }
 
 function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
@@ -171,7 +221,7 @@ function error(x){$("error").textContent=x}
 function startApp(){
   $("auth-screen").classList.add("hidden");$("app").classList.remove("hidden");
   poll();pollTimer=setInterval(poll,1000);
-  setTimeout(()=>$("message").focus(),50);
+  if(!isMobile()) setTimeout(()=>$("message").focus(),50);
 }
 function logout(){if(!confirm("Log out of Dinky Chat?"))return;localStorage.removeItem("dinky_session");clearInterval(pollTimer);location.reload()}
 function $(id){return document.getElementById(id)}
@@ -217,17 +267,20 @@ function renderSidebar(){
 }
 function switchChannel(ch,serverId=null){
   currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
+  if(isMobile()) closeMobilePanels();
+  const memToggle = `<button class="small mobile-toggle-btn" style="background:var(--hover);color:var(--text)" onclick="toggleMembers()">👥</button>`;
   $("actions").innerHTML="";
   if(serverId){
     $("member").classList.remove("hidden");
     $("header").textContent="🏠 #"+ch.split("_").pop();
     $("actions").innerHTML=`<button class="small" style="background:var(--hover);color:var(--text)" onclick="serverSettings()">⚙ Settings</button>
       <button class="small primary" onclick="createChannel()">+ Channel</button>
-      <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>`;
+      <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>` + memToggle;
     renderMembers();
   }else if(ch==="global"){
     $("member").classList.remove("hidden");
     $("header").textContent="# global-chat";
+    $("actions").innerHTML = memToggle;
     renderGlobalMembers();
   }else{
     $("member").classList.add("hidden");
@@ -324,7 +377,7 @@ function messageMenu(e,sender,text,id,owner){
 }
 function showMenu(x,y,items){
   document.querySelectorAll(".popup").forEach(x=>x.remove());
-  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px #0008`;
+  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${Math.min(x, window.innerWidth - 120)}px;top:${Math.min(y, window.innerHeight - 100)}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px #0008`;
   items.forEach(([t,fn])=>{const b=document.createElement("button");b.className="nav";b.textContent=t;b.onclick=()=>{d.remove();fn()};d.appendChild(b)});document.body.appendChild(d);
 }
 document.addEventListener("click",()=>document.querySelectorAll(".popup").forEach(x=>x.remove()));
@@ -453,6 +506,7 @@ document.addEventListener("keydown",e=>{
     document.querySelectorAll(".popup").forEach(x=>x.remove());
     if(!$('overlay').classList.contains('hidden'))closeModal();
     if(replyTarget)cancelReply();
+    closeMobilePanels();
   }
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){
     e.preventDefault();
@@ -460,5 +514,6 @@ document.addEventListener("keydown",e=>{
   }
 });
 </script>
-</body>
-</html>
+
+
+</body></html>
