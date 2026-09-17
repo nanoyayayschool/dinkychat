@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinky Chat — Web Edition</title>
+    <style>
+        :root {
+            --bg-dark: #0F0F17;
+            --bg-panel: #11111B;
+            --bg-surface: #181825;
+            --bg-input: #1E1E2E;
+            --bg-hover: #313244;
+            --accent-purple: #CBA6F7;
+            --accent-blue: #89B4FA;
+            --accent-green: #A6E3A1;
+            --accent-red: #F38BA8;
+            --text-main: #CDD6F4;
+            --text-sub: #A6ADC8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { width: 100%; height: 100%; background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; }
+
+        .hidden { display: none !important; }
+
+        /* --- AUTH SCREEN --- */
+        #auth-screen {
+            display: flex; justify-content: center; align-items: center; height: 100vh; background: var(--bg-dark);
+        }
+        .auth-card {
+            background: var(--bg-surface); padding: 30px; border-radius: 12px; width: 360px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center;
+        }
+        .auth-card h1 { color: var(--accent-purple); font-size: 24px; margin-bottom: 4px; }
+        .auth-card p { color: var(--text-sub); font-size: 13px; margin-bottom: 20px; }
+        .form-group { text-align: left; margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; color: #BAC2DE; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid transparent; border-radius: 6px; color: var(--text-main); outline: none; }
+        .form-group input:focus { border-color: var(--accent-purple); }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 8px; transition: 0.2s; }
+        .btn-primary { background: var(--accent-purple); color: #11111B; }
+        .btn-secondary { background: var(--bg-panel); color: var(--text-main); }
+        .btn:hover { opacity: 0.9; }
+        #auth-error { color: var(--accent-red); font-size: 12px; margin-bottom: 10px; min-height: 16px; }
+
+        /* --- MAIN CHAT LAYOUT --- */
+        #app-screen { display: flex; width: 100vw; height: 100vh; }
+        
+        .sidebar { width: 250px; background: var(--bg-panel); display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-search { padding: 10px; }
+        .sidebar-search input { width: 100%; padding: 6px 10px; background: var(--bg-input); border: none; border-radius: 4px; color: var(--text-main); font-size: 13px; }
+        .section-title { font-size: 11px; font-weight: bold; color: var(--accent-purple); padding: 8px 12px 4px 12px; text-transform: uppercase; }
+        .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 8px; }
+        
+        .nav-btn { width: 100%; text-align: left; padding: 8px 10px; background: transparent; border: none; border-radius: 4px; color: var(--text-main); font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .nav-btn:hover { background: var(--bg-input); }
+        .nav-btn.active { background: var(--bg-hover); font-weight: bold; }
+        .nav-btn.sub-chan { padding-left: 24px; font-size: 12px; color: var(--text-sub); }
+
+        .sidebar-actions { padding: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 4px; }
+        .btn-sm { padding: 6px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-align: center; }
+
+        /* Chat Container */
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-surface) 100%); }
+        .header-bar { padding: 12px 16px; background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .header-title { font-weight: bold; color: var(--accent-purple); font-size: 16px; }
+        .header-actions { display: flex; gap: 6px; }
+
+        .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .msg-row { display: flex; flex-direction: column; background: rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 6px; position: relative; }
+        .msg-reply-preview { font-size: 11px; color: var(--text-sub); border-left: 2px solid #5865F2; padding-left: 6px; margin-bottom: 4px; font-style: italic; }
+        .msg-header { display: flex; gap: 8px; align-items: center; }
+        .msg-author { font-weight: bold; font-size: 14px; cursor: pointer; }
+        .msg-text { font-size: 14px; margin-top: 2px; word-break: break-word; white-space: pre-wrap; }
+        .msg-highlight { background: #3E2D54 !important; border: 1px solid var(--accent-purple); }
+
+        .reply-bar { background: #2B2D31; padding: 6px 12px; font-size: 12px; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center; }
+        .input-bar { padding: 12px 16px; background: var(--bg-surface); display: flex; gap: 8px; position: relative; }
+        .input-bar input { flex: 1; padding: 10px; background: var(--bg-input); border: none; border-radius: 6px; color: var(--text-main); outline: none; }
+
+        .member-sidebar { width: 180px; background: var(--bg-panel); border-left: 1px solid rgba(255,255,255,0.05); padding: 12px; overflow-y: auto; }
+
+        /* Emoji Picker Popover */
+        .emoji-picker { position: absolute; bottom: 60px; left: 16px; background: var(--bg-surface); border: 1px solid var(--bg-hover); border-radius: 8px; padding: 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .emoji-btn { background: var(--bg-input); border: none; color: var(--text-main); padding: 6px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .emoji-btn:hover { background: var(--bg-hover); }
+
+        /* Context Menu & Modals */
+        .context-menu { position: absolute; background: var(--bg-surface); border: 1px solid var(--bg-hover); border-radius: 6px; padding: 4px 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .context-menu-item { padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--text-main); }
+        .context-menu-item:hover { background: var(--bg-hover); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal { background: var(--bg-panel); padding: 20px; border-radius: 8px; width: 380px; max-height: 80vh; overflow-y: auto; }
+        .modal h3 { margin-bottom: 12px; color: var(--accent-purple); }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h1>DINKY CHAT</h1>
+            <p>Sign in to start chatting</p>
+            <div id="auth-error"></div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="auth-user">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="auth-pass">
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="auth-auto" checked>
+                <label for="auth-auto">Auto Login on Startup</label>
+            </div>
+            <button class="btn btn-primary" onclick="attemptLogin()">Log In</button>
+            <button class="btn btn-secondary" onclick="attemptRegister()">Create Account</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="app-screen" class="hidden">
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-search">
+                <input type="text" id="search-input" placeholder="Search..." oninput="renderSidebar()">
+            </div>
+            <div class="sidebar-scroll">
+                <div class="section-title">⚡ Channels</div>
+                <button class="nav-btn" onclick="switchChannel('global')"># global-chat</button>
+                <button class="nav-btn" style="color: var(--accent-green)" onclick="openFriendsTab()">👥 Friends Tab</button>
+
+                <div class="section-title">🏠 Servers</div>
+                <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+                    <button class="btn-sm btn-primary" style="flex:1" onclick="promptCreateServer()">+ Create</button>
+                    <button class="btn-sm" style="flex:1; background: var(--accent-blue); color: #111;" onclick="openDiscoveryModal()">🔍 Discover</button>
+                </div>
+                <div id="servers-list"></div>
+
+                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>💬 Direct Messages</span>
+                    <button id="req-btn" class="btn-sm" style="background: var(--bg-hover); color: var(--accent-green); font-size: 10px;" onclick="openRequestsModal()">Reqs (0)</button>
+                </div>
+                <div id="friends-list"></div>
+            </div>
+
+            <div class="sidebar-actions">
+                <button class="btn-sm" style="background: var(--accent-green); color: #111;" onclick="promptAddFriend()">+ Add Friend</button>
+                <button class="btn-sm" style="background: var(--bg-hover); color: var(--text-main);" onclick="openSettingsModal()">⚙ Style & Settings</button>
+                <button class="btn-sm" style="background: var(--accent-red); color: #111;" onclick="logout()">🚪 Log Out</button>
+            </div>
+        </div>
+
+        <!-- MAIN CHAT AREA -->
+        <div class="chat-main">
+            <div class="header-bar">
+                <div class="header-title" id="header-label"># global-chat</div>
+                <div class="header-actions" id="server-actions"></div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages"></div>
+
+            <div id="reply-bar" class="reply-bar hidden">
+                <span id="reply-text"></span>
+                <span style="cursor:pointer; color: var(--accent-red); font-weight:bold;" onclick="cancelReply()">✕</span>
+            </div>
+
+            <div class="input-bar">
+                <button class="btn-sm" style="background: var(--bg-hover); color: var(--text-main);" onclick="toggleEmoticons()">:-)</button>
+                <div id="emoji-picker" class="emoji-picker hidden"></div>
+                <input type="text" id="msg-input" placeholder="Message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="btn-sm btn-primary" style="padding: 0 16px;" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- RIGHT MEMBER SIDEBAR (SERVERS) -->
+        <div class="member-sidebar hidden" id="member-sidebar">
+            <div class="section-title">Members</div>
+            <div id="members-list"></div>
+        </div>
+    </div>
+
+    <!-- CONTEXT MENU -->
+    <div id="context-menu" class="context-menu hidden"></div>
+
+    <!-- GENERIC MODAL -->
+    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <script>
+        const BASE_URL = "https://dinky476.pythonanywhere.com";
+        const EMOTICONS = [":)", "XD", ":P", ":D", "<3", ">:(", "B)", ">:)", ":3", ":(", ";)", "<:0", ">:0", "<:3", ">:3", "OwO", "UwU"];
+
+        let session = null;
+        let currentChannel = "global";
+        let currentServerId = null;
+        let replyTarget = null;
+        let pollTimer = null;
+        let lastMsgCount = -1;
+
+        let rawFriends = [];
+        let rawServers = [];
+        let pendingRequests = [];
+        let blockedUsers = [];
+
+        // --- AUTH & SETUP ---
+        window.onload = () => {
+            setupEmojiPicker();
+            const savedSession = localStorage.getItem("dinky_session");
+            const settings = JSON.parse(localStorage.getItem("dinky_settings") || '{"auto_login": true}');
+            
+            if (savedSession && settings.auto_login) {
+                session = JSON.parse(savedSession);
+                startApp();
+            }
+        };
+
+        async function api(endpoint, payload) {
+            try {
+                const res = await fetch(`${BASE_URL}/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                return await res.json();
+            } catch (e) {
+                return { status: "error", message: `Connection error: ${e}` };
+            }
+        }
+
+        async function attemptLogin() {
+            const username = document.getElementById('auth-user').value.trim();
+            const password = document.getElementById('auth-pass').value.trim();
+            const autoLogin = document.getElementById('auth-auto').checked;
+
+            if (!username || !password) return showError("Fill in all fields.");
+
+            const res = await api("login", { username, password });
+            if (res.status === "success") {
+                session = res;
+                localStorage.setItem("dinky_session", JSON.stringify(res));
+                localStorage.setItem("dinky_settings", JSON.stringify({ auto_login: autoLogin }));
+                startApp();
+            } else {
+                showError(res.message || "Login failed.");
+            }
+        }
+
+        async function attemptRegister() {
+            const username = document.getElementById('auth-user').value.trim();
+            const password = document.getElementById('auth-pass').value.trim();
+            if (!username || !password) return showError("Fill in all fields.");
+
+            const res = await api("register", { username, password });
+            if (res.status === "success") {
+                alert("Account created successfully! You can now log in.");
+            } else {
+                showError(res.message || "Registration failed.");
+            }
+        }
+
+        function showError(msg) { document.getElementById('auth-error').innerText = msg; }
+
+        function startApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            pollData();
+            pollTimer = setInterval(pollData, 1200);
+        }
+
+        function logout() {
+            localStorage.removeItem("dinky_session");
+            clearInterval(pollTimer);
+            location.reload();
+        }
+
+        // --- POLLING & RENDERING ---
+        async function pollData() {
+            if (!session) return;
+            const res = await api("get_social_data", { username: session.username, token: session.token });
+            if (res.status === "success") {
+                rawFriends = res.friends || [];
+                rawServers = res.servers || [];
+                pendingRequests = res.pending_requests || [];
+                blockedUsers = res.blocked_users || [];
+
+                document.getElementById('req-btn').innerText = `Reqs (${pendingRequests.length})`;
+                renderSidebar();
+                if (currentServerId) renderMembers();
+            }
+
+            if (currentChannel === "friends_tab") return;
+
+            let channel = currentChannel;
+            if (channel !== "global" && !channel.startsWith("server_")) {
+                channel = [session.username, currentChannel].sort().join("-");
+            }
+
+            const msgRes = await api("get_messages", { username: session.username, token: session.token, channel });
+            const messages = msgRes.messages || [];
+
+            if (messages.length !== lastMsgCount) {
+                lastMsgCount = messages.length;
+                renderMessages(messages);
+            }
+        }
+
+        function renderSidebar() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const srvBox = document.getElementById('servers-list');
+            const frnBox = document.getElementById('friends-list');
+
+            srvBox.innerHTML = '';
+            rawServers.forEach(s => {
+                if (query && !s.name.toLowerCase().includes(query)) return;
+                const sEl = document.createElement('div');
+                sEl.innerHTML = `<div style="font-weight:bold; font-size:12px; color:var(--accent-purple); padding:4px 0;">🏠 ${s.name}</div>`;
+                (s.channels || ['general']).forEach(ch => {
+                    const cChan = `server_${s.id}_${ch}`;
+                    sEl.innerHTML += `<button class="nav-btn sub-chan ${currentChannel===cChan?'active':''}" onclick="switchChannel('${cChan}', ${s.id})"># ${ch}</button>`;
+                });
+                srvBox.appendChild(sEl);
+            });
+
+            frnBox.innerHTML = '';
+            rawFriends.forEach(f => {
+                if (query && !f.username.toLowerCase().includes(query)) return;
+                frnBox.innerHTML += `<button class="nav-btn ${currentChannel===f.username?'active':''}" onclick="switchChannel('${f.username}')">💬 ${f.username}</button>`;
+            });
+        }
+
+        function switchChannel(channelName, serverId = null) {
+            currentChannel = channelName;
+            currentServerId = serverId;
+            cancelReply();
+            lastMsgCount = -1;
+
+            const actions = document.getElementById('server-actions');
+            actions.innerHTML = '';
+
+            if (serverId) {
+                document.getElementById('member-sidebar').classList.remove('hidden');
+                document.getElementById('header-label').innerText = `🏠 #${channelName.split('_').pop()}`;
+                actions.innerHTML = `
+                    <button class="btn-sm btn-secondary" onclick="openServerSettings()">⚙ Settings</button>
+                    <button class="btn-sm btn-primary" onclick="promptCreateChannel()">+ Channel</button>
+                    <button class="btn-sm" style="background:var(--accent-red); color:#111;" onclick="deleteCurrentChannel()">🗑 Delete</button>
+                `;
+                renderMembers();
+            } else {
+                document.getElementById('member-sidebar').classList.add('hidden');
+                if (channelName === "global") document.getElementById('header-label').innerText = "# global-chat";
+                else if (channelName === "friends_tab") document.getElementById('header-label').innerText = "👥 Friends Hub";
+                else document.getElementById('header-label').innerText = `💬 DM @${channelName}`;
+            }
+            renderSidebar();
+        }
+
+        function renderMembers() {
+            const srv = rawServers.find(s => s.id === currentServerId);
+            const box = document.getElementById('members-list');
+            box.innerHTML = '';
+            if (srv && srv.members) {
+                srv.members.forEach(m => {
+                    box.innerHTML += `<div class="nav-btn" onclick="viewProfile('${m}')">• @${m}</div>`;
+                });
+            }
+        }
+
+        function renderMessages(messages) {
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML = '';
+
+            messages.forEach((m, i) => {
+                if (blockedUsers.includes(m.sender)) return;
+
+                let text = m.text;
+                let replyHTML = '';
+
+                if (text.startsWith("↳ Replying to")) {
+                    const lines = text.split("\n");
+                    replyHTML = `<div class="msg-reply-preview">${lines[0]}</div>`;
+                    text = lines.slice(1).join("\n");
+                }
+
+                const isPing = text.includes(`@${session.username}`);
+                const row = document.createElement('div');
+                row.className = `msg-row ${isPing ? 'msg-highlight' : ''}`;
+                row.oncontextmenu = (e) => showContextMenu(e, m.sender, text, m.id || i, m.is_owner);
+
+                row.innerHTML = `
+                    ${replyHTML}
+                    <div class="msg-header">
+                        <span class="msg-author" style="color:${m.name_color || '#CBA6F7'}" onclick="viewProfile('${m.sender}')">${m.sender}</span>
+                    </div>
+                    <div class="msg-text">${escapeHTML(text)}</div>
+                `;
+                chat.appendChild(row);
+            });
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // --- CHAT ACTIONS ---
+        async function sendMessage() {
+            const input = document.getElementById('msg-input');
+            let text = input.value.trim();
+            if (!text || currentChannel === "friends_tab") return;
+
+            input.value = '';
+            if (replyTarget) {
+                text = `↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
+            }
+
+            let channel = currentChannel;
+            if (channel !== "global" && !channel.startsWith("server_")) {
+                channel = [session.username, currentChannel].sort().join("-");
+            }
+
+            cancelReply();
+            await api("send_message", { username: session.username, token: session.token, channel, text });
+            pollData();
+        }
+
+        function setReplyTarget(sender, text) {
+            const clean = text.split('\n')[0].substring(0, 45) + (text.length > 45 ? "..." : "");
+            replyTarget = { sender, text: clean };
+            document.getElementById('reply-text').innerText = `Replying to @${sender}: "${clean}"`;
+            document.getElementById('reply-bar').classList.remove('hidden');
+        }
+
+        function cancelReply() {
+            replyTarget = null;
+            document.getElementById('reply-bar').classList.add('hidden');
+        }
+
+        function showContextMenu(e, sender, text, msgId, isOwner) {
+            e.preventDefault();
+            const menu = document.getElementById('context-menu');
+            menu.style.left = `${e.pageX}px`;
+            menu.style.top = `${e.pageY}px`;
+            
+            let html = `<div class="context-menu-item" onclick="setReplyTarget('${sender}', '${text}'); hideContextMenu();">Reply</div>`;
+            if (sender === session.username || isOwner) {
+                html += `<div class="context-menu-item" style="color:var(--accent-red);" onclick="deleteMessage(${msgId}); hideContextMenu();">Delete Message</div>`;
+            }
+            menu.innerHTML = html;
+            menu.classList.remove('hidden');
+        }
+
+        function hideContextMenu() { document.getElementById('context-menu').classList.add('hidden'); }
+        document.addEventListener('click', hideContextMenu);
+
+        async function deleteMessage(msgId) {
+            await api("delete_message", { username: session.username, token: session.token, msg_id: msgId });
+            pollData();
+        }
+
+        // --- FRIENDS & PROFILES ---
+        function openFriendsTab() {
+            switchChannel("friends_tab");
+            const chat = document.getElementById('chat-messages');
+            chat.innerHTML = `<h2 style="color:var(--accent-purple); margin-bottom:12px;">=== FRIENDS HUB ===</h2>`;
+            rawFriends.forEach(f => {
+                chat.innerHTML += `<div class="nav-btn" style="padding:10px;" onclick="viewProfile('${f.username}')">• @${f.username} — Status: ${f.status || 'Offline'} [Click to View Profile]</div>`;
+            });
+        }
+
+        async function viewProfile(target) {
+            const res = await api("get_user_profile", { username: session.username, token: session.token, target });
+            if (res.status !== "success") return alert("Could not fetch profile.");
+            const p = res.profile;
+
+            openModal(`
+                <div style="background:${p.banner_color || '#313244'}; height:40px; border-radius:4px; margin-bottom:10px;"></div>
+                <h2 style="color:${p.name_color || '#CBA6F7'}">@${p.username}</h2>
+                <div style="color:var(--accent-green); font-size:12px; margin-bottom:10px;">Status: ${p.status || 'Offline'}</div>
+                <div style="background:var(--bg-input); padding:8px; border-radius:4px; margin-bottom:12px; font-size:13px;">${escapeHTML(p.bio || 'No bio provided.')}</div>
+                ${target !== session.username ? `
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-sm" style="flex:1; background:var(--accent-red); color:#111;" onclick="blockUser('${target}')">Block</button>
+                    </div>
+                ` : ''}
+            `);
+        }
+
+        async function blockUser(target) {
+            await api("block_user", { username: session.username, token: session.token, target });
+            alert(`Blocked @${target}`);
+            closeModal();
+        }
+
+        async function promptAddFriend() {
+            const target = prompt("Enter username to add:");
+            if (target) {
+                const res = await api("send_friend_request", { username: session.username, token: session.token, target: target.trim() });
+                alert(res.message || (res.status === "success" ? "Request sent!" : "Failed."));
+            }
+        }
+
+        // --- MODALS & UI EXTRAS ---
+        function openModal(contentHTML) {
+            document.getElementById('modal-content').innerHTML = contentHTML;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+        function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+
+        function setupEmojiPicker() {
+            const picker = document.getElementById('emoji-picker');
+            EMOTICONS.forEach(emo => {
+                const btn = document.createElement('button');
+                btn.className = 'emoji-btn';
+                btn.innerText = emo;
+                btn.onclick = () => {
+                    document.getElementById('msg-input').value += emo;
+                    picker.classList.add('hidden');
+                };
+                picker.appendChild(btn);
+            });
+        }
+
+        function toggleEmoticons() { document.getElementById('emoji-picker').classList.toggle('hidden'); }
+        function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+
+        async function promptCreateServer() {
+            const name = prompt("Enter Server Name:");
+            if (name) {
+                await api("create_server", { username: session.username, token: session.token, name: name.trim() });
+                pollData();
+            }
+        }
+
+        async function promptCreateChannel() {
+            if (!currentServerId) return;
+            const cname = prompt("Enter channel name:");
+            if (cname) {
+                await api("create_server_channel", { username: session.username, token: session.token, server_id: currentServerId, channel_name: cname.trim().toLowerCase().replace(/\s+/g, '-') });
+                pollData();
+            }
+        }
+    </script>
+</body>
+</html>
