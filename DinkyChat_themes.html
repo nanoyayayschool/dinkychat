@@ -572,8 +572,11 @@ function openModal(content){$("modal").innerHTML=content;$("overlay").classList.
 function closeModal(e){if(!e||e.target===$("overlay"))$("overlay").classList.add("hidden")}
 async function addFriend(){
   const target=prompt("Enter username to add:");if(!target)return;
-  const r=await api("send_friend_request",{username:session.username,token:session.token,target:target.trim()});
-  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));poll();
+  const clean=target.trim();
+  if(clean===session.username)return alert("You cannot add yourself.");
+  const r=await api("send_friend_request",{username:session.username,token:session.token,target:clean});
+  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));
+  if(r.status==="success")poll();
 }
 async function createServer(){
   const raw=prompt("Enter Server Name:");
@@ -617,7 +620,13 @@ async function discover(){
 }
 function filterDiscover(){const q=($('discoverSearch')?.value||'').toLowerCase().trim();document.querySelectorAll('.discover-item').forEach(x=>x.style.display=!q||x.dataset.search.includes(q)?'flex':'none')}
 async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:String(id)});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
-async function sendDiscover(u){const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));}
+async function sendDiscover(u){
+  u=String(u||"").trim();
+  if(!u||u===session.username)return alert("Please choose another user.");
+  const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});
+  alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));
+  if(r.status==="success")await poll();
+}
 async function requests(){
   openModal(`<h2>Friend Requests</h2><div id="requestList">${requestsList.length?requestsList.map(u=>`<div class="card"><span>@${esc(u)}</span><span><button class="small" style="background:var(--green);color:#111" onclick="respond('${esc(u)}','accept')">Accept</button> <button class="small" style="background:var(--red);color:#111" onclick="respond('${esc(u)}','decline')">Decline</button></span></div>`).join(""):"<span style='color:var(--sub)'>No pending requests.</span>"}</div>`);
 }
