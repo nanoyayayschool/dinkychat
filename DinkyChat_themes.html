@@ -76,6 +76,22 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0}
 .color-field label{display:block;font-size:10px;color:var(--sub);margin-bottom:3px}
 .color-field input[type=color]{width:100%;height:34px;border:0;border-radius:5px;background:transparent;padding:0;cursor:pointer}
 .theme-note{font-size:11px;color:var(--sub);line-height:1.4;margin:4px 0 10px}
+
+/* mobile + customization extras */
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;color:#111;background:var(--blue)}
+.avatar.small-avatar{width:28px;height:28px;font-size:11px}.profile-avatar{width:76px;height:76px;border-radius:50%;object-fit:cover;border:4px solid var(--surface);margin-top:-38px;background:var(--blue)}
+.server-icon{width:28px;height:28px;border-radius:9px;object-fit:cover;vertical-align:middle;background:var(--hover);margin-right:6px}.server-banner{height:130px;border-radius:10px 10px 0 0;background:linear-gradient(135deg,var(--accent,var(--purple)),var(--surface));background-size:cover;background-position:center}.server-custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.server-custom-grid .full{grid-column:1/-1}.theme-dropdown{position:relative}.theme-dropdown summary{list-style:none;cursor:pointer}.theme-dropdown summary::-webkit-details-marker{display:none}.theme-menu{position:absolute;bottom:42px;left:0;width:210px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;box-shadow:0 12px 30px var(--shadow);z-index:1000}.theme-menu button{width:100%;text-align:left;margin:2px 0}.mobile-only{display:none}
+@media (max-width:800px){
+  #app{grid-template-columns:1fr!important;position:relative;overflow:hidden}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:min(88vw,330px);z-index:900;transform:translateX(-105%);transition:transform .2s ease;box-shadow:10px 0 30px #0008}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .member{position:fixed;right:0;top:0;bottom:0;width:min(82vw,300px);z-index:890;transform:translateX(105%);transition:transform .2s ease;box-shadow:-10px 0 30px #0008}
+  .member.mobile-open{transform:translateX(0)}
+  .chat{min-width:0;width:100vw}.header{padding:8px 10px}.header-title{max-width:55vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.header-actions,.actions{gap:4px}.actions .small{padding:7px 8px}.mobile-only{display:inline-flex!important}
+  .inputbar{padding:7px;gap:5px}.inputbar textarea{min-width:0;font-size:15px}.file-btn{padding:8px!important}.inputbar .primary{padding:0 10px!important}
+  .messages{padding:10px 8px}.msg{padding:8px 7px}.modal{width:calc(100vw - 20px);max-height:88vh;overflow:auto}.server-custom-grid{grid-template-columns:1fr}.theme-menu{bottom:auto;top:42px;left:auto;right:0}.server-tools{flex-wrap:wrap}.server-tools .small{min-width:0}
+}
+@media (max-width:420px){.header-status{display:none}.actions .small{font-size:11px}.msgtext{font-size:14px}.auth-card{width:calc(100vw - 24px)}.theme-grid{grid-template-columns:repeat(2,1fr)!important}}
 </style>
 </head>
 <body>
@@ -111,12 +127,12 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0}
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
+      <details class="theme-dropdown"><summary class="small" style="background:var(--hover);color:var(--text)">🎨 Themes ▾</summary><div class="theme-menu"><button class="small" onclick="quickTheme('dinky')">🌙 Dinky</button><button class="small" onclick="quickTheme('ocean')">🌊 Ocean</button><button class="small" onclick="quickTheme('forest')">🌲 Forest</button><button class="small" onclick="quickTheme('sunset')">🌅 Sunset</button><button class="small" onclick="quickTheme('lavender')">💜 Lavender</button><button class="small" onclick="quickTheme('mono')">⚪ Mono</button><button class="small primary" onclick="settings();this.closest('details').open=false">🎨 More themes & custom</button></div></details>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
   <main class="chat">
-    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
+    <header class="header"><div style="display:flex;align-items:center;gap:7px"><button class="small mobile-only" style="background:var(--hover);color:var(--text)" onclick="toggleMobileSidebar()">☰</button><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div style="display:flex;align-items:center;gap:5px"><div id="actions" class="actions"></div><button class="small mobile-only" style="background:var(--hover);color:var(--text)" onclick="toggleMobileMembers()">👥</button></div></header>
     <div id="messages" class="messages"></div>
     <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
@@ -265,6 +281,10 @@ function messageKeydown(e){
   if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
 }
 
+function quickTheme(id){applyTheme(id);document.querySelectorAll('.theme-dropdown').forEach(d=>d.open=false)}
+function toggleMobileSidebar(){document.querySelector('.sidebar')?.classList.toggle('mobile-open');document.querySelector('.member')?.classList.remove('mobile-open')}
+function toggleMobileMembers(){document.querySelector('.member')?.classList.toggle('mobile-open');document.querySelector('.sidebar')?.classList.remove('mobile-open')}
+function closeMobilePanels(){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.querySelector('.member')?.classList.remove('mobile-open')}
 function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
 window.onload=()=>{
   setupEmoji();
@@ -316,7 +336,9 @@ async function loadOwnProfile(){
       name_color:p.name_color||profile.name_color,
       font_family:p.font_family||profile.font_family,
       avatar_color:p.avatar_color||profile.avatar_color,
-      banner_color:p.banner_color||profile.banner_color
+      banner_color:p.banner_color||profile.banner_color,
+      avatar_url:p.avatar_url||profile.avatar_url,
+      banner_url:p.banner_url||profile.banner_url
     };
     document.documentElement.style.setProperty("--font", profile.font_family);
   }
@@ -350,7 +372,7 @@ function renderSidebar(){
   servers.forEach(s=>{
     if(q&&!s.name.toLowerCase().includes(q))return;
     const box=document.createElement("div");
-    box.innerHTML=`<div class="server-head">🏠 ${esc(s.name)}</div>`;
+    box.innerHTML=`<div class="server-head">${s.icon_url?`<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}" alt="">`:"🏠"} ${esc(s.name)}</div>`;
     (s.channels||["general"]).forEach(c=>{
       const b=document.createElement("button");b.className="nav sub"+(currentChannel===`server_${s.id}_${c}`?" active":"");
       b.textContent=`# ${c}`;b.onclick=()=>switchChannel(`server_${s.id}_${c}`,s.id);box.appendChild(b);
@@ -364,6 +386,7 @@ function renderSidebar(){
   });
 }
 function switchChannel(ch,serverId=null){
+  closeMobilePanels();
   currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
   $("actions").innerHTML="";
   if(serverId){
@@ -583,14 +606,17 @@ async function deleteChannel(){
   if(r.status==="success"){alert("Channel deleted.");switchChannel("global")}else alert(r.message||"Could not delete channel.");
 }
 async function discover(){
-  const r=await api("get_public_servers",{username:session.username,token:session.token});const pub=r.servers||[];
-  const p=await api("get_discover_profiles",{username:session.username,token:session.token});const people=p.profiles||[];
-  openModal(`<h2>Discover — Servers & People</h2>
-    <input id="discoverSearch" placeholder="Search...">
-    <h3>Servers</h3><div id="discoverServers">${pub.map(s=>`<div class="card"><span>${esc(s.name)}</span><button class="small" style="background:var(--green);color:#111" onclick="joinServer(${s.id})">Join</button></div>`).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
-    <hr><h3>People</h3><div id="discoverPeople">${people.map(x=>`<div class="card"><span>@${esc(x.username)} (${esc(x.status||"Offline")})</span><button class="small primary" onclick="sendDiscover(${JSON.stringify(x.username)})">+ Add Friend</button></div>`).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`);
+  const r=await api("get_public_servers",{username:session.username,token:session.token});
+  const p=await api("get_discover_profiles",{username:session.username,token:session.token});
+  const pub=r.status==="success"?(r.servers||[]):[]; const people=p.status==="success"?(p.profiles||[]):[];
+  if(r.status!=="success"&&p.status!=="success")return alert(r.message||p.message||"Discovery is unavailable right now.");
+  openModal(`<h2>🔍 Discover</h2>
+    <input id="discoverSearch" placeholder="Search servers or people..." oninput="filterDiscover()">
+    <div id="discoverServers"><h3>Servers</h3>${pub.map(s=>`<div class="card discover-item" data-search="${esc((s.name+' '+(s.description||'')+' '+(s.tags||[]).join(' ')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px;flex:1">${s.icon_url?`<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}">`:"🌐"}<div><b>${esc(s.name)}</b><div style="font-size:11px;color:var(--sub)">${esc(s.description||'Public server')} • ${s.members_count} member${s.members_count===1?'':'s'}</div></div></div><button class="small" style="background:var(--green);color:#111" onclick="joinServer(${JSON.stringify(String(s.id))})">Join</button></div>`).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
+    <hr><div id="discoverPeople"><h3>People</h3>${people.map(x=>`<div class="card discover-item" data-search="${esc((x.username+' '+(x.status||'')+' '+(x.bio||'')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px"><div class="avatar small-avatar">${esc(x.username[0]||'?').toUpperCase()}</div><span>@${esc(x.username)} <small style="color:var(--sub)">${esc(x.status||"Offline")}</small></span></div><button class="small primary" onclick="sendDiscover(${JSON.stringify(x.username)})">+ Add Friend</button></div>`).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`);
 }
-async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:id});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
+function filterDiscover(){const q=($('discoverSearch')?.value||'').toLowerCase().trim();document.querySelectorAll('.discover-item').forEach(x=>x.style.display=!q||x.dataset.search.includes(q)?'flex':'none')}
+async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:String(id)});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
 async function sendDiscover(u){const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));}
 async function requests(){
   openModal(`<h2>Friend Requests</h2><div id="requestList">${requestsList.length?requestsList.map(u=>`<div class="card"><span>@${esc(u)}</span><span><button class="small" style="background:var(--green);color:#111" onclick="respond('${esc(u)}','accept')">Accept</button> <button class="small" style="background:var(--red);color:#111" onclick="respond('${esc(u)}','decline')">Decline</button></span></div>`).join(""):"<span style='color:var(--sub)'>No pending requests.</span>"}</div>`);
@@ -599,13 +625,34 @@ async function respond(u,action){await api("respond_friend_request",{username:se
 async function serverSettings(){
   const s=servers.find(x=>String(x.id)===String(currentServerId));if(!s)return;
   if(s.owner!==session.username)return alert("Only the server owner can modify these settings.");
-  openModal(`<h2>Server Management</h2>
-    <button class="btn secondary" onclick="togglePublic()">Toggle Public / Private Visibility</button>
-    <button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation (Everyone vs Owner)</button>
-    <button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
+  const roles=s.roles||[]; const ob=s.onboarding||{};
+  openModal(`<h2>⚙ Server Customization</h2>
+    <div class="server-banner" style="background-image:${s.banner_url?`url(${absoluteFileUrl(s.banner_url)})`:"linear-gradient(135deg,var(--purple),var(--surface))"}"></div>
+    <div class="server-custom-grid">
+      <div class="full"><label>Server Name</label><input id="svName" value="${esc(s.name)}"></div>
+      <div class="full"><label>Description</label><textarea id="svDesc" maxlength="1000">${esc(s.description||"")}</textarea></div>
+      <div><label>Primary Color</label><input id="svPrimary" type="color" value="${s.primary_color||'#181825'}"></div>
+      <div><label>Accent Color</label><input id="svAccent" type="color" value="${s.accent_color||'#CBA6F7'}"></div>
+      <div class="full"><label>Tags (comma separated)</label><input id="svTags" value="${esc((s.tags||[]).join(', '))}" placeholder="gaming, art, friends"></div>
+      <div class="full"><label>Games / interests (comma separated)</label><input id="svGames" value="${esc((s.games||[]).join(', '))}" placeholder="Minecraft, Roblox..."></div>
+      <div class="full"><label>Welcome message</label><input id="svWelcome" value="${esc(s.welcome_message||"")}" placeholder="Welcome to the server!"></div>
+    </div>
+    <div class="row" style="margin-top:8px"><button class="small" onclick="uploadServerAsset('icon')">🖼 Change Icon</button><button class="small" onclick="uploadServerAsset('banner')">🌄 Change Banner</button><button class="small primary" onclick="saveServerProfile()">Save Profile</button></div>
+    <hr><h3>🎭 Roles</h3><div id="roleList">${roles.map(r=>`<div class="card"><span><b style="color:${esc(r.color||'var(--text)')}">${esc(r.name)}</b><small style="color:var(--sub)"> • ${(r.members||[]).length} member${(r.members||[]).length===1?'':'s'}</small></span>${r.id==='everyone'?'':`<button class="small" style="background:var(--red);color:#111" onclick="deleteRole(${JSON.stringify(String(r.id))})">Delete</button>`}</div>`).join('')}</div><button class="small primary" onclick="createRole()">+ Create Role</button>
+    <hr><h3>👋 Onboarding / Server Guide</h3><label class="checkbox"><input id="obEnabled" type="checkbox" ${ob.enabled?'checked':''}> Enable welcome/onboarding</label><textarea id="obWelcome" placeholder="Tell new members what this place is about...">${esc(ob.welcome||'')}</textarea><button class="small primary" onclick="saveOnboarding()">Save Onboarding</button>
+    <hr><button class="btn secondary" onclick="togglePublic()">${s.is_public?'🌐 Make Private':'🌐 Make Public / Discoverable'}</button><button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation</button><button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
 }
-async function togglePublic(){const r=await api("toggle_server_public",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||"Updated!");poll()}
-async function toggleCreation(){const r=await api("toggle_channel_creation_perm",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||`Channel creation set to: ${r.channel_creation_perm||"everyone"}`);poll()}
+async function saveServerProfile(){
+  const tags=$('svTags').value.split(',').map(x=>x.trim()).filter(Boolean);const games=$('svGames').value.split(',').map(x=>x.trim()).filter(Boolean);
+  const r=await api('update_server_profile',{username:session.username,token:session.token,server_id:String(currentServerId),name:$('svName').value,description:$('svDesc').value,tags,games,primary_color:$('svPrimary').value,accent_color:$('svAccent').value,welcome_message:$('svWelcome').value});
+  if(r.status==='success'){alert('Server customization saved!');await poll();serverSettings()}else alert(r.message||'Could not save server profile.');
+}
+async function uploadServerAsset(type){
+  const input=document.createElement('input');input.type='file';input.accept='image/png,image/jpeg,image/gif,image/webp';input.onchange=async()=>{if(!input.files[0])return;const fd=new FormData();fd.append('username',session.username);fd.append('token',session.token);fd.append('server_id',String(currentServerId));fd.append('asset_type',type);fd.append('file',input.files[0]);const r=await fetch(`${BASE_URL}/upload_server_asset`,{method:'POST',body:fd});const out=await r.json().catch(()=>({status:'error',message:'Upload failed'}));if(out.status==='success'){await poll();serverSettings()}else alert(out.message||'Upload failed.')};input.click();
+}
+async function createRole(){const name=prompt('Role name:');if(!name)return;const r=await api('create_role',{username:session.username,token:session.token,server_id:String(currentServerId),name,color:'#CBA6F7',permissions:['view','send']});if(r.status==='success')serverSettings();else alert(r.message||'Could not create role.')}
+async function deleteRole(id){if(!confirm('Delete this role?'))return;const r=await api('delete_role',{username:session.username,token:session.token,server_id:String(currentServerId),role_id:String(id)});if(r.status==='success')serverSettings();else alert(r.message||'Could not delete role.')}
+async function saveOnboarding(){const r=await api('update_onboarding',{username:session.username,token:session.token,server_id:String(currentServerId),enabled:$('obEnabled').checked,welcome:$('obWelcome').value,questions:[]});if(r.status==='success'){alert('Onboarding saved!');poll()}else alert(r.message||'Could not save onboarding.')}
 async function deleteServer(){
   openModal(`<h2 style="color:var(--red)">Delete Server</h2><p style="margin-bottom:10px">Enter password twice to delete.</p><input id="del1" type="password" placeholder="Password"><input id="del2" type="password" placeholder="Confirm Password"><button class="btn" style="background:var(--red);color:#111" onclick="confirmDeleteServer()">Delete Server Permanently</button>`);
 }
@@ -637,7 +684,7 @@ async function settings(){
       </div>
       <button class="btn primary" style="margin-top:8px" onclick="applyCustomTheme()">Apply Custom Theme</button>
     </div>
-    <hr>
+    <hr><h3>🪪 Profile</h3><div class="row"><button class="small" onclick="uploadProfileAsset('avatar')">🖼 Upload Avatar</button><button class="small" onclick="uploadProfileAsset('banner')">🌄 Upload Banner</button></div><div class="theme-note">PNG, JPG, GIF or WEBP. Your avatar and banner are shown on your profile card.</div>
     <label>Status Preset</label><input id="status" value="${esc(profile.status_msg)}">
     <label>Bio</label><textarea id="bio">${esc(profile.bio)}</textarea>
     <button class="btn secondary" onclick="toggleProfile()">Toggle Public Profile (Discoverability)</button>
@@ -655,6 +702,7 @@ async function settings(){
     renderThemeGrid(saved?.type==="preset"?saved.id:null);
   },0);
 }
+async function uploadProfileAsset(type){const input=document.createElement('input');input.type='file';input.accept='image/png,image/jpeg,image/gif,image/webp';input.onchange=async()=>{if(!input.files[0])return;const fd=new FormData();fd.append('username',session.username);fd.append('token',session.token);fd.append('file',input.files[0]);const endpoint=type==='avatar'?'upload_avatar':'upload_banner';const r=await fetch(`${BASE_URL}/${endpoint}`,{method:'POST',body:fd});const out=await r.json().catch(()=>({status:'error',message:'Upload failed'}));if(out.status==='success'){await loadOwnProfile();closeModal();viewProfile(session.username)}else alert(out.message||'Upload failed.')};input.click()}
 async function toggleProfile(){const r=await api("toggle_profile_public",{username:session.username,token:session.token});alert(r.message||"Updated profile visibility.")}
 async function copyUsername(){
   try{await navigator.clipboard.writeText(session.username);alert(`Copied @${session.username}`)}
@@ -670,12 +718,8 @@ async function saveSettings(){
 async function viewProfile(target){
   const r=await api("get_user_profile",{username:session.username,token:session.token,target});
   if(r.status!=="success")return alert("Could not fetch profile.");
-  const p=r.profile||{};
-  openModal(`<div class="profile-banner" style="background:${esc(p.banner_color||"#313244")}"></div>
-    <h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2>
-    <div class="status">Status: ${esc(p.status||"Offline")}</div>
-    <div class="bio">${esc(p.bio||"No bio provided.")}</div>
-    ${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:""}`);
+  const p=r.profile||{};const avatar=p.avatar_url?`<img class="profile-avatar" src="${absoluteFileUrl(p.avatar_url)}">`:`<div class="profile-avatar" style="display:flex;align-items:center;justify-content:center;background:${esc(p.avatar_color||'#89B4FA')};color:#111;font-size:28px;font-weight:900">${esc((p.username||'?')[0]).toUpperCase()}</div>`;
+  openModal(`<div class="profile-banner" style="background:${p.banner_url?`url(${absoluteFileUrl(p.banner_url)}) center/cover`:esc(p.banner_color||"#313244")}"></div><div style="padding:0 12px 12px">${avatar}<h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2><div class="status">${esc(p.status||"Offline")}</div><div class="bio">${esc(p.bio||"No bio provided.")}</div>${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:`<button class="small primary" onclick="settings();">Edit Profile</button>`}</div>`);
 }
 async function unfriend(u){await api("unfriend_user",{username:session.username,token:session.token,target:u});alert(`Removed @${u} from friends.`);closeModal();poll()}
 async function block(u){await api("block_user",{username:session.username,token:session.token,target:u});alert(`Blocked @${u}.`);closeModal();poll()}
