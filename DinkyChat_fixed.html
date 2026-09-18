@@ -10,7 +10,7 @@
   --hover:#313244;--purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;
   --red:#f38ba8;--orange:#fab387;--text:#cdd6f4;--sub:#a6adc8;
   --font:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
-  --border:#ffffff1a;--shadow:#00000088;--msg:#00000033;--reply:var(--reply);
+  --border:#ffffff1a;--shadow:#00000088;--msg:#00000033;--reply:#2b2d31;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
@@ -44,8 +44,8 @@ button{cursor:pointer}
 .msg{background:var(--msg);padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
 .author{font-weight:700;font-size:14px;cursor:pointer}.msgtext{font-size:14px;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}
 .reply-preview{font-size:11px;color:var(--sub);border-left:2px solid var(--blue);padding-left:6px;margin-bottom:4px;font-style:italic}
-.replybar{background:var(--reply);padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}
-.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}
+.replybar{background:var(--reply);padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}.file-card{margin-top:7px;max-width:min(520px,100%);background:var(--input);border:1px solid var(--border);border-radius:7px;padding:7px}.file-image{display:block;max-width:100%;max-height:320px;border-radius:5px;cursor:pointer}.file-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:12px}.file-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}.file-btn{min-width:40px;font-size:16px}.file-info{font-size:11px;color:var(--sub);position:absolute;left:16px;bottom:2px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .inputbar textarea{flex:1;padding:10px;background:var(--input);border:0;border-radius:6px;color:var(--text);outline:0;resize:none;min-height:40px;max-height:120px;line-height:20px}
 .member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid var(--border);padding:12px;overflow:auto}
 .member .section{padding-left:0}
@@ -120,10 +120,13 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0}
     <div id="messages" class="messages"></div>
     <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
+      <button class="small file-btn" title="Attach a file" style="background:var(--hover);color:var(--text)" onclick="pickFile()">📎</button>
+      <input id="fileInput" type="file" class="hidden" onchange="handleFilePick(event)">
       <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
       <div id="emoji" class="emoji hidden"></div>
       <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
       <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
+      <div id="fileInfo" class="file-info hidden"></div>
     </div>
   </main>
   <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
@@ -138,6 +141,7 @@ let friends=[],servers=[],requestsList=[],blocked=[],lastCount=-1,pollTimer=null
 let connected=false;
 let profileCache={};
 let globalMemberUsers=[];
+let selectedFile=null;
 let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe UI",avatar_color:"#89B4FA",banner_color:"#313244"};
 
 function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
@@ -455,11 +459,47 @@ function renderMessages(msgs){
     const a=document.createElement("span");a.className="author";a.textContent=m.sender;a.style.color=m.name_color||"#CBA6F7";a.onclick=()=>viewProfile(m.sender);
     const head=document.createElement("div");head.appendChild(a);
     div.innerHTML=reply;div.appendChild(head);
-    const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body);
+    if(text){const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body)}
+    if(m.file_url) div.appendChild(createFileElement(m));
     div.oncontextmenu=e=>{e.preventDefault();messageMenu(e,m.sender,text,m.id??i,!!m.is_owner)};$("messages").appendChild(div);
   });
   if(oldScroll>=0 && box.scrollHeight-box.clientHeight-oldScroll<80)box.scrollTop=box.scrollHeight;
   else box.scrollTop=oldScroll;
+}
+function absoluteFileUrl(url){return String(url||"").startsWith("http")?url:`${BASE_URL}${url}`;}
+function createFileElement(m){
+  const wrap=document.createElement("div");wrap.className="file-card";
+  const url=absoluteFileUrl(m.file_url);
+  const name=m.file_name||String(m.file_url).split("/").pop()||"Attached file";
+  const type=(m.file_type||"").toLowerCase();
+  if(type.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp)$/i.test(name)){
+    const img=document.createElement("img");img.src=url;img.alt=name;img.className="file-image";img.loading="lazy";
+    img.onclick=()=>window.open(url,"_blank");wrap.appendChild(img);
+  }
+  const row=document.createElement("div");row.className="file-row";
+  const label=document.createElement("span");label.textContent=`📎 ${name}${m.file_size?` • ${formatBytes(m.file_size)}`:""}`;
+  const link=document.createElement("a");link.href=url;link.target="_blank";link.rel="noopener";link.download=name;link.className="small primary";link.textContent="Open";
+  row.append(label,link);wrap.appendChild(row);
+  return wrap;
+}
+function formatBytes(n){if(!n)return "";const u=["B","KB","MB","GB"];let i=0,x=Number(n);while(x>=1024&&i<u.length-1){x/=1024;i++}return `${x<10&&i>0?x.toFixed(1):Math.round(x)} ${u[i]}`}
+function pickFile(){if(currentChannel==="friends_tab")return;$("fileInput").click()}
+function handleFilePick(e){
+  selectedFile=e.target.files?.[0]||null;
+  const info=$("fileInfo");
+  if(!selectedFile){info.textContent="";info.classList.add("hidden");return}
+  info.textContent=`📎 ${selectedFile.name} • ${formatBytes(selectedFile.size)} (press Send)`;info.classList.remove("hidden");
+}
+function clearSelectedFile(){selectedFile=null;const input=$("fileInput");if(input)input.value="";const info=$("fileInfo");if(info){info.textContent="";info.classList.add("hidden")}}
+async function uploadChatFile(file){
+  const fd=new FormData();fd.append("username",session.username);fd.append("token",session.token);fd.append("file",file);
+  try{
+    const r=await fetch(`${BASE_URL}/upload_chat_file`,{method:"POST",body:fd});
+    const raw=await r.text();let out;try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
+    if(r.status===401){handleAuthFailure();return {status:"error",message:"Your session expired. Please log in again."}}
+    if(r.ok)setConnection(true);else setConnection(false,`HTTP ${r.status}`);
+    return out;
+  }catch(e){setConnection(false,"offline");return {status:"error",message:"Upload failed: "+e.message}}
 }
 function messageMenu(e,sender,text,id,owner){
   const items=[["Reply",()=>setReply(sender,text)]];
@@ -475,19 +515,31 @@ document.addEventListener("click",()=>document.querySelectorAll(".popup").forEac
 function setReply(sender,text){const clean=text.split("\n")[0].slice(0,45)+(text.length>45?"...":"");replyTarget={sender,text:clean};$("replytext").textContent=`Replying to @${sender}: "${clean}"`;$("replybar").classList.remove("hidden");$("message").focus()}
 function cancelReply(){replyTarget=null;$("replybar").classList.add("hidden")}
 async function send(){
-  let text=$("message").value.trim();if(!text||currentChannel==="friends_tab")return;
-  $("message").value="";
-  if(replyTarget)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
+  let text=$("message").value.trim();if((!text&&!selectedFile)||currentChannel==="friends_tab")return;
+  const originalText=text, file=selectedFile;
+  if(replyTarget&&text)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
   let ch=currentChannel;if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
-  cancelReply();
-  const r=await api("send_message",{username:session.username,token:session.token,channel:ch,text});
-  if(r.status==="error"){
-    $("message").value=text;
-    autoGrow($("message"));
-    alert(r.message||"Failed to send message.");
-    return;
+  const sendBtn=document.querySelector('.inputbar .primary:last-of-type');
+  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent=file?"Uploading…":"Sending…"}
+  try{
+    let fileData=null;
+    if(file){
+      const up=await uploadChatFile(file);
+      if(up.status!=="success"){alert(up.message||"File upload failed.");return}
+      fileData=up;
+    }
+    $("message").value="";cancelReply();clearSelectedFile();
+    const payload={username:session.username,token:session.token,channel:ch,text};
+    if(fileData){payload.file_url=fileData.file_url;payload.file_name=fileData.file_name;payload.file_size=fileData.file_size;payload.file_type=fileData.file_type}
+    const r=await api("send_message",payload);
+    if(r.status==="error"){
+      $("message").value=originalText;autoGrow($("message"));
+      alert(r.message||"Failed to send message.");return;
+    }
+    poll();
+  }finally{
+    if(sendBtn){sendBtn.disabled=false;sendBtn.textContent="Send"}
   }
-  poll();
 }
 async function deleteMessage(id){const r=await api("delete_message",{username:session.username,token:session.token,msg_id:id});if(r.status!=="success")alert(r.message||"Could not delete message.");poll()}
 function friendsTab(){switchChannel("friends_tab");$("messages").innerHTML="<h2 style='color:var(--purple)'>=== FRIENDS HUB ===</h2>"+friends.map(f=>`<button class="nav">• @${esc(f.username)} — Status: ${esc(f.status||"Offline")}</button>`).join("")}
