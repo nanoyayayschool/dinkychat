@@ -3,461 +3,254 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dinky Chat — Web Edition</title>
+<title>Dinky Chat — Chat Your Way</title>
 <style>
 :root{
-  --bg:#0f0f17;--panel:#11111b;--surface:#181825;--input:#1e1e2e;
-  --hover:#313244;--purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;
-  --red:#f38ba8;--orange:#fab387;--text:#cdd6f4;--sub:#a6adc8;
-  --font:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+  --bg:#0f0f17;--surface:#181825;--surface2:#1e1e2e;--hover:#313244;
+  --purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;--red:#f38ba8;
+  --text:#cdd6f4;--sub:#a6adc8;
 }
-*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
-html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
-button,input{font:inherit}
-.hidden{display:none!important}
-button{cursor:pointer}
-#auth-screen{height:100vh;display:flex;align-items:center;justify-content:center}
-.auth-card{width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px #0008}
-.auth-card h1{text-align:center;color:var(--purple);font-size:24px}
-.auth-card p{text-align:center;color:var(--sub);font-size:13px;margin:4px 0 20px}
-.form-group{margin-bottom:12px}.form-group label{display:block;font-size:12px;font-weight:700;color:#bac2de;margin-bottom:4px}
-.form-group input{width:100%;padding:10px;background:var(--input);border:1px solid transparent;border-radius:6px;color:var(--text);outline:0}
-.form-group input:focus{border-color:var(--purple)}
-.checkbox{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:15px}
-.btn{width:100%;padding:10px;border:0;border-radius:6px;font-weight:700;margin-bottom:8px}
-.primary{background:var(--purple);color:#11111b}.secondary{background:var(--panel);color:var(--text)}
-#error{height:16px;color:var(--red);font-size:12px;margin-bottom:10px}
-#app{display:flex;width:100vw;height:100vh}
-.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid #fff0a}
-.search{padding:10px}.search input{width:100%;padding:7px 10px;background:var(--input);border:0;border-radius:4px;color:var(--text);outline:0}
-.scroll{flex:1;overflow:auto;padding:0 8px}.section{font-size:11px;font-weight:700;color:var(--purple);padding:8px 4px 4px;text-transform:uppercase}
-.nav{width:100%;border:0;border-radius:4px;background:transparent;color:var(--text);text-align:left;padding:8px 10px;font-size:13px;margin-bottom:2px}
-.nav:hover,.nav.active{background:var(--hover)}.nav.sub{padding-left:24px;font-size:12px;color:var(--sub)}
-.server-head{font-weight:700;font-size:12px;color:var(--purple);padding:4px 6px}
-.server-tools{display:flex;gap:4px;margin-bottom:6px}.small{padding:6px;border:0;border-radius:4px;font-size:11px;font-weight:700}
-.sidebar-actions{padding:8px;border-top:1px solid #fff1;display:flex;flex-direction:column;gap:4px}
-.chat{flex:1;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg),var(--surface))}
-.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff1}
-.header-title{font-weight:700;color:var(--purple);font-size:16px}.header-status{font-size:11px;color:var(--sub);margin-left:10px}.actions{display:flex;gap:6px}
-.messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-.msg{background:#0002;padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
-.author{font-weight:700;font-size:14px;cursor:pointer}.msgtext{font-size:14px;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}
-.reply-preview{font-size:11px;color:var(--sub);border-left:2px solid #5865f2;padding-left:6px;margin-bottom:4px;font-style:italic}
-.replybar{background:#2b2d31;padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}
-.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}
-.inputbar textarea{flex:1;padding:10px;background:var(--input);border:0;border-radius:6px;color:var(--text);outline:0;resize:none;min-height:40px;max-height:120px;line-height:20px}
-.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid #fff1;padding:12px;overflow:auto}
-.member .section{padding-left:0}
-.emoji{position:absolute;bottom:60px;left:16px;background:var(--surface);border:1px solid var(--hover);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;box-shadow:0 4px 12px #0008}
-.modal-overlay{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:100}
-.modal{width:420px;max-width:92vw;max-height:85vh;overflow:auto;background:var(--panel);padding:20px;border-radius:8px}
-.modal h2,.modal h3{color:var(--purple);margin-bottom:12px}
-.modal input,.modal textarea{width:100%;background:var(--input);border:0;color:var(--text);padding:9px;border-radius:5px;outline:0;margin:4px 0 10px}
-.modal textarea{resize:vertical;min-height:70px}
-.row{display:flex;gap:6px}.row>*{flex:1}
-.card{background:var(--input);padding:9px;border-radius:5px;margin:5px 0;display:flex;align-items:center;justify-content:space-between}
-.profile-banner{height:55px;border-radius:5px;margin-bottom:10px}
-.status{color:var(--green);font-size:12px;margin-bottom:10px}
-.bio{background:var(--input);padding:9px;border-radius:5px;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}
-hr{border:0;border-top:1px solid #fff1;margin:12px 0}
-@media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font:inherit;cursor:pointer}
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:18px 6%;display:flex;align-items:center;justify-content:space-between;
+  background:#0f0f17cc;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff0d
+}
+.logo{font-weight:900;letter-spacing:.5px;color:var(--purple);font-size:20px}
+.logo span{color:var(--text)}
+.navlinks{display:flex;gap:26px;color:var(--sub);font-size:14px}
+.navlinks a:hover{color:var(--text)}
+.navbtn{padding:9px 16px;border-radius:8px;background:var(--purple);color:#11111b;font-weight:800}
+.hero{
+  min-height:100vh;padding:150px 6% 80px;display:grid;grid-template-columns:1.05fr .95fr;
+  gap:60px;align-items:center;position:relative;overflow:hidden
+}
+.glow{position:absolute;width:500px;height:500px;border-radius:50%;filter:blur(120px);opacity:.18;pointer-events:none}
+.glow.one{background:var(--purple);top:-180px;left:-160px}
+.glow.two{background:var(--blue);right:-180px;bottom:-180px}
+.badge{
+  display:inline-block;padding:7px 12px;border:1px solid #cba6f733;border-radius:999px;
+  color:var(--purple);background:#cba6f70b;font-size:12px;font-weight:800;margin-bottom:20px
+}
+h1{font-size:clamp(48px,7vw,86px);line-height:.95;letter-spacing:-4px;max-width:750px}
+.gradient{background:linear-gradient(100deg,var(--purple),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:18px;line-height:1.7;color:var(--sub);max-width:620px;margin:25px 0 30px}
+.buttons{display:flex;gap:12px;flex-wrap:wrap}
+.primary,.secondary{padding:13px 20px;border-radius:9px;font-weight:800;border:1px solid transparent}
+.primary{background:var(--purple);color:#11111b}
+.secondary{background:var(--surface2);border-color:#ffffff12}
+.primary:hover,.secondary:hover{transform:translateY(-2px)}
+.preview{
+  background:var(--surface);border:1px solid #ffffff12;border-radius:16px;
+  box-shadow:0 30px 80px #0008;overflow:hidden;transform:rotate(1deg)
+}
+.windowbar{height:42px;background:var(--surface2);display:flex;align-items:center;gap:7px;padding:0 14px}
+.dot{width:9px;height:9px;border-radius:50%;background:#ffffff33}
+.previewbody{display:grid;grid-template-columns:120px 1fr 100px;min-height:380px}
+.pside{background:#11111b;padding:16px 10px}.pchat{padding:16px}.pmembers{background:#11111b;padding:16px 10px}
+.mini-title{font-size:9px;text-transform:uppercase;color:var(--purple);font-weight:900;margin-bottom:9px}
+.mini-item{padding:8px;font-size:10px;color:var(--sub);border-radius:5px;margin-bottom:3px}
+.mini-item.active{background:var(--hover);color:var(--text)}
+.chathead{font-weight:900;color:var(--purple);padding-bottom:15px;border-bottom:1px solid #fff1}
+.msg{padding:13px 0;border-bottom:1px solid #fff0}
+.msg strong{font-size:11px}.msg p{font-size:10px;color:var(--sub);margin-top:4px;line-height:1.5}
+.member{font-size:9px;color:var(--sub);padding:7px 0}
+section{padding:95px 6%}
+.section-head{text-align:center;max-width:700px;margin:0 auto 50px}
+.kicker{color:var(--purple);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:2px}
+h2{font-size:42px;letter-spacing:-1.5px;margin:10px 0 14px}
+.section-head p{color:var(--sub);line-height:1.7}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1100px;margin:auto}
+.card{
+  background:var(--surface);border:1px solid #ffffff0d;border-radius:13px;padding:25px;
+  transition:.2s
+}
+.card:hover{transform:translateY(-5px);border-color:#cba6f733}
+.icon{font-size:27px;margin-bottom:18px}
+.card h3{font-size:18px;margin-bottom:9px}.card p{font-size:14px;line-height:1.7;color:var(--sub)}
+.demo{background:linear-gradient(180deg,var(--bg),#151522)}
+.steps{max-width:900px;margin:auto;display:grid;gap:12px}
+.step{display:grid;grid-template-columns:50px 1fr;gap:18px;align-items:start;background:var(--surface);padding:22px;border-radius:12px;border:1px solid #fff1}
+.num{width:40px;height:40px;border-radius:10px;background:var(--purple);color:#11111b;display:grid;place-items:center;font-weight:900}
+.step p{color:var(--sub);line-height:1.6;margin-top:5px}
+.cta{text-align:center;padding:110px 6%;border-top:1px solid #fff1}
+.cta p{color:var(--sub);margin:15px auto 25px;max-width:550px;line-height:1.7}
+footer{padding:25px 6%;border-top:1px solid #fff1;color:var(--sub);font-size:12px;display:flex;justify-content:space-between}
+@media(max-width:850px){
+  .navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:130px}.preview{max-width:650px}
+  .features{grid-template-columns:1fr}h2{font-size:34px}
+}
+@media(max-width:520px){.previewbody{grid-template-columns:80px 1fr}.pmembers{display:none}h1{letter-spacing:-2px}.hero{padding-left:5%;padding-right:5%}section{padding-left:5%;padding-right:5%}}
+
+.chat-app{padding:95px 6%;background:#0b0b12;border-top:1px solid #fff1}
+.chat-frame-wrap{
+  max-width:1400px;margin:auto;background:#11111b;border:1px solid #ffffff18;
+  border-radius:14px;overflow:hidden;box-shadow:0 30px 90px #0009
+}
+.chat-framebar{
+  height:42px;background:var(--surface2);display:flex;align-items:center;
+  justify-content:space-between;padding:0 14px;font-size:12px;color:var(--sub)
+}
+.chat-framebar .frame-actions{display:flex;gap:7px;align-items:center}
+.chat-framebar button,.chat-framebar a{
+  border:0;border-radius:6px;padding:6px 10px;background:var(--hover);
+  color:var(--text);font-size:11px;text-decoration:none;cursor:pointer
+}
+.chat-framebar button:hover,.chat-framebar a:hover{background:#ffffff18}
+#dinkyFrame{display:block;width:100%;height:760px;border:0;background:var(--bg)}
+@media(max-width:700px){#dinkyFrame{height:700px}.chat-app{padding-left:3%;padding-right:3%}}
 </style>
 </head>
 <body>
-<div id="auth-screen">
-  <div class="auth-card">
-    <h1>DINKY CHAT</h1><p>Sign in to start chatting</p>
-    <div id="error"></div>
-    <div class="form-group"><label>Username</label><input id="user"></div>
-    <div class="form-group"><label>Password</label><input id="pass" type="password"></div>
-    <label class="checkbox"><input id="auto" type="checkbox" checked> Auto Login on Startup</label>
-    <button class="btn primary" onclick="login()">Log In</button>
-    <button class="btn secondary" onclick="register()">Create Account</button>
+<nav class="navbar">
+  <a class="logo" href="#">DINKY <span>CHAT</span></a>
+  <div class="navlinks">
+    <a href="#features">features</a>
+    <a href="#how">how it works</a>
+    <a href="#about">about</a>
   </div>
-</div>
+  <a class="navbtn" href="#chat-app">open chat ↗</a>
+</nav>
 
-<div id="app" class="hidden">
-  <aside class="sidebar">
-    <div class="search"><input id="search" placeholder="Search..." oninput="renderSidebar()"></div>
-    <div class="scroll">
-      <div class="section">⚡ Channels</div>
-      <button class="nav" onclick="switchChannel('global')"># global-chat</button>
-      <button class="nav" style="color:var(--green)" onclick="friendsTab()">👥 Friends Tab</button>
-      <div class="section">🏠 Servers</div>
-      <div class="server-tools">
-        <button class="small primary" style="flex:1" onclick="createServer()">+ Create</button>
-        <button class="small" style="flex:1;background:var(--blue);color:#111" onclick="discover()">🔍 Discover</button>
+<main>
+<section class="hero">
+  <div class="glow one"></div><div class="glow two"></div>
+  <div>
+    <span class="badge">🔒 privacy focused • social • dinky</span>
+    <h1>the first <span class="gradient">privacy-focused</span><br>chatting app.</h1>
+    <p>
+      dinky chat is a lightweight social chat platform built around servers,
+      channels, friends and profiles — with a clean interface that gets out of your way.
+    </p>
+    <div class="buttons">
+      <a class="primary" href="#chat-app" onclick="openChat(event)">launch dinky chat</a>
+      <a class="secondary" href="#features">see what's inside ↓</a>
+    </div>
+  </div>
+
+  <div class="preview" aria-label="dinky chat interface preview">
+    <div class="windowbar"><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
+    <div class="previewbody">
+      <aside class="pside">
+        <div class="mini-title">channels</div>
+        <div class="mini-item active"># global-chat</div>
+        <div class="mini-item">👥 friends</div>
+        <div class="mini-title" style="margin-top:18px">servers</div>
+        <div class="mini-item">🏠 dinky hub</div>
+        <div class="mini-item">🏠 gaming</div>
+      </aside>
+      <div class="pchat">
+        <div class="chathead"># global-chat</div>
+        <div class="msg"><strong style="color:#cba6f7">dinky</strong><p>yo, welcome to dinky chat 👋</p></div>
+        <div class="msg"><strong style="color:#89b4fa">pixel</strong><p>this ui is actually kinda clean ngl</p></div>
+        <div class="msg"><strong style="color:#a6e3a1">bob</strong><p>we are so back.</p></div>
       </div>
-      <div id="servers"></div>
-      <div class="section" style="display:flex;justify-content:space-between;align-items:center">
-        <span>💬 Direct Messages</span><button id="reqs" class="small" style="background:var(--hover);color:var(--green)" onclick="requests()">Requests (0)</button>
+      <aside class="pmembers">
+        <div class="mini-title">members</div>
+        <div class="member">• @dinky</div><div class="member">• @pixel</div><div class="member">• @bob</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="section-head">
+    <span class="kicker">what's inside</span>
+    <h2>small app. big chat energy.</h2>
+    <p>everything you need for a casual community chat, without turning the screen into a cockpit.</p>
+  </div>
+  <div class="features">
+    <article class="card"><div class="icon">🏠</div><h3>servers & channels</h3><p>Create servers, add channels, switch between conversations, and manage your own community spaces.</p></article>
+    <article class="card"><div class="icon">👥</div><h3>friends & dms</h3><p>Add friends, accept requests, open direct messages, and keep your social circle in one place.</p></article>
+    <article class="card"><div class="icon">🎨</div><h3>your profile</h3><p>Customise your username colour, status, bio, banner and font to give your profile some personality.</p></article>
+    <article class="card"><div class="icon">🔎</div><h3>discover</h3><p>Find public servers and discover people who have chosen to make their profiles discoverable.</p></article>
+    <article class="card"><div class="icon">↩️</div><h3>replies</h3><p>Reply to messages, keep conversations understandable, and jump back into the context of a chat.</p></article>
+    <article class="card"><div class="icon">🙂</div><h3>little quality-of-life things</h3><p>Emoji shortcuts, message controls, keyboard search, auto-growing messages and more.</p></article>
+  </div>
+</section>
+
+<section class="demo" id="how">
+  <div class="section-head">
+    <span class="kicker">get started</span>
+    <h2>three clicks away from yapping.</h2>
+    <p>the complicated bit is handled by the app. you just show up.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="num">1</div><div><h3>create an account</h3><p>Choose a username and password, then log in to your dinky chat account.</p></div></div>
+    <div class="step"><div class="num">2</div><div><h3>find your people</h3><p>Add friends, browse discoverable profiles, or join a public server.</p></div></div>
+    <div class="step"><div class="num">3</div><div><h3>start chatting</h3><p>Pick a channel or DM and start sending messages. revolutionary technology, apparently.</p></div></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-head">
+    <span class="kicker">about dinky chat</span>
+    <h2>made to feel simple.</h2>
+    <p>
+      dinky chat is designed as a straightforward social chat experience:
+      servers and channels for communities, friends and DMs for one-to-one conversations,
+      and custom profiles for a little extra personality.
+    </p>
+  </div>
+</section>
+
+
+<section id="chat-app" class="chat-app">
+  <div class="section-head">
+    <span class="kicker">dinky chat</span>
+    <h2>right here. no new tab.</h2>
+    <p>launch the full dinky chat experience directly inside this website.</p>
+  </div>
+  <div class="chat-frame-wrap">
+    <div class="chat-framebar">
+      <span>● dinky chat</span>
+      <div class="frame-actions">
+        <a href="DinkyChat_fixed.html" download="DinkyChat.html">⇩ download</a>
+        <button onclick="toggleFullscreen()" id="fullscreenBtn">⛶ fullscreen</button>
+        <button onclick="closeChat()">hide chat</button>
       </div>
-      <div id="friends"></div>
     </div>
-    <div class="sidebar-actions">
-      <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
-      <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
-    </div>
-  </aside>
-  <main class="chat">
-    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
-    <div id="messages" class="messages"></div>
-    <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
-    <div class="inputbar">
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
-      <div id="emoji" class="emoji hidden"></div>
-      <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
-      <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
-    </div>
-  </main>
-  <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
-</div>
-<div id="overlay" class="modal-overlay hidden" onclick="closeModal(event)"><div id="modal" class="modal" onclick="event.stopPropagation()"></div></div>
+    <iframe id="dinkyFrame" src="DinkyChat_fixed.html" title="Dinky Chat" loading="lazy"></iframe>
+  </div>
+</section>
+
+<section class="cta">
+  <span class="kicker">ready?</span>
+  <h2>come say hi.</h2>
+  <p>open dinky chat, make an account, and get yapping.</p>
+  <a class="primary" href="#chat-app" onclick="openChat(event)">open dinky chat ↗</a>
+</section>
+</main>
+
+<footer>
+  <span>© dinky chat</span>
+  <span>built with questionable amounts of caffeine ☕</span>
+</footer>
 
 <script>
-const BASE_URL="https://dinky476.pythonanywhere.com";
-const EMOTICONS=[":)","XD",":P",":D","<3",">:(","B)",">:) ",":3",":(",";)","<:0",">:0","<:3",">:3","OwO","UwU"];
-let session=null,currentChannel="global",currentServerId=null,replyTarget=null;
-let friends=[],servers=[],requestsList=[],blocked=[],lastCount=-1,pollTimer=null;
-let connected=false;
-let profileCache={};
-let globalMemberUsers=[];
-let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe UI",avatar_color:"#89B4FA",banner_color:"#313244"};
-
-function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
-async function api(endpoint,data){
-  try{
-    const r=await fetch(`${BASE_URL}/${endpoint}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-    const raw=await r.text();
-    let out;
-    try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
-    if(r.ok){setConnection(true)}else{setConnection(false,`HTTP ${r.status}`)}
-    return out;
-  }catch(e){setConnection(false,"offline");return {status:"error",message:"Connection error: "+e.message};}
+function openChat(e){
+  if(e)e.preventDefault();
+  const app=document.getElementById("chat-app");
+  app.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function setConnection(ok,label){
-  connected=ok;
-  if($("conn")){$("conn").textContent=`● ${label|| (ok?"connected":"offline")}`;$('conn').style.color=ok?"var(--green)":"var(--red)";}
+function closeChat(){
+  document.getElementById("features").scrollIntoView({behavior:"smooth",block:"start"});
 }
-function autoGrow(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
-function messageKeydown(e){
-  if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
-}
-
-function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
-window.onload=()=>{
-  setupEmoji();
-  const s=localStorage.getItem("dinky_session"), st=settingsData();
-  if(s&&st.auto_login){try{session=JSON.parse(s);startApp()}catch{}}
-};
-async function login(){
-  const username=$("user").value.trim(),password=$("pass").value.trim();
-  if(!username||!password)return error("Fill in all fields.");
-  const r=await api("login",{username,password});
-  if(r.status==="success"){
-    session=r;localStorage.setItem("dinky_session",JSON.stringify(r));
-    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));startApp();
-  }else error(r.message||"Login failed.");
-}
-async function register(){
-  const username=$("user").value.trim(),password=$("pass").value.trim();
-  if(!username||!password)return error("Fill in all fields.");
-  const r=await api("register",{username,password});
-  if(r.status==="success")alert("Account created successfully! You can now log in.");
-  else error(r.message||"Registration failed.");
-}
-function error(x){$("error").textContent=x}
-function startApp(){
-  $("auth-screen").classList.add("hidden");$("app").classList.remove("hidden");
-  poll();pollTimer=setInterval(poll,1000);
-  setTimeout(()=>$("message").focus(),50);
-}
-function logout(){if(!confirm("Log out of Dinky Chat?"))return;localStorage.removeItem("dinky_session");clearInterval(pollTimer);location.reload()}
-function $(id){return document.getElementById(id)}
-async function poll(){
-  if(!session)return;
-  const r=await api("get_social_data",{username:session.username,token:session.token});
-  if(r.status==="success"){
-    friends=r.friends||[];servers=r.servers||[];requestsList=r.pending_requests||[];blocked=r.blocked_users||[];
-    $("reqs").textContent=`Requests (${requestsList.length})`;renderSidebar();
-    if(currentServerId)renderMembers();
-  }
-  if(currentChannel==="friends_tab")return;
-  let ch=currentChannel;
-  if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
-  const m=await api("get_messages",{username:session.username,token:session.token,channel:ch});
-  const msgs=m.messages||[];
-  if(currentChannel==="global")await updateGlobalMembers(msgs);
-  if(msgs.length!==lastCount){
-    const box=$("messages");
-    const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
-    lastCount=msgs.length;renderMessages(msgs);
-    if(!nearBottom)box.scrollTop=box.dataset.previousScroll||0;
-  }
-}
-function renderSidebar(){
-  const q=$("search").value.toLowerCase();
-  $("servers").innerHTML="";
-  servers.forEach(s=>{
-    if(q&&!s.name.toLowerCase().includes(q))return;
-    const box=document.createElement("div");
-    box.innerHTML=`<div class="server-head">🏠 ${esc(s.name)}</div>`;
-    (s.channels||["general"]).forEach(c=>{
-      const b=document.createElement("button");b.className="nav sub"+(currentChannel===`server_${s.id}_${c}`?" active":"");
-      b.textContent=`# ${c}`;b.onclick=()=>switchChannel(`server_${s.id}_${c}`,s.id);box.appendChild(b);
-    });$("servers").appendChild(box);
-  });
-  $("friends").innerHTML="";
-  friends.forEach(f=>{
-    if(q&&!f.username.toLowerCase().includes(q))return;
-    const b=document.createElement("button");b.className="nav"+(currentChannel===f.username?" active":"");
-    b.textContent=`💬 ${f.username}`;b.onclick=()=>switchChannel(f.username);$("friends").appendChild(b);
-  });
-}
-function switchChannel(ch,serverId=null){
-  currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
-  $("actions").innerHTML="";
-  if(serverId){
-    $("member").classList.remove("hidden");
-    $("header").textContent="🏠 #"+ch.split("_").pop();
-    $("actions").innerHTML=`<button class="small" style="background:var(--hover);color:var(--text)" onclick="serverSettings()">⚙ Settings</button>
-      <button class="small primary" onclick="createChannel()">+ Channel</button>
-      <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>`;
-    renderMembers();
-  }else if(ch==="global"){
-    $("member").classList.remove("hidden");
-    $("header").textContent="# global-chat";
-    renderGlobalMembers();
+function toggleFullscreen(){
+  const frame=document.getElementById("chat-app");
+  if(!document.fullscreenElement){
+    frame.requestFullscreen?.();
   }else{
-    $("member").classList.add("hidden");
-    $("header").textContent=ch==="friends_tab"?"👥 Friends Hub":`💬 DM @${ch}`;
-  }
-  renderSidebar();
-}
-function renderMembers(){
-  const s=servers.find(x=>String(x.id)===String(currentServerId));
-  const box=$("members");
-  box.innerHTML="";
-  $("member").querySelector(".section").textContent="MEMBERS";
-  if(!s){
-    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No members available.</div>';
-    return;
-  }
-  const list=Array.isArray(s.members)?s.members:[];
-  if(!list.length){
-    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No members available.</div>';
-    return;
-  }
-  list.forEach(u=>{
-    const b=document.createElement("button");
-    b.className="nav";
-    b.textContent=`• @${u}`;
-    b.title="View profile";
-    b.onclick=()=>viewProfile(u);
-    box.appendChild(b);
-  });
-}
-async function updateGlobalMembers(msgs){
-  const users=[...new Set(msgs.map(m=>m.sender).filter(Boolean))];
-  globalMemberUsers=users;
-  renderGlobalMembers();
-
-  for(const u of users){
-    if(Object.prototype.hasOwnProperty.call(profileCache,u))continue;
-    const res=await api("get_user_profile",{
-      username:session.username,token:session.token,target:u
-    });
-    profileCache[u]=res.status==="success"?res.profile:null;
-  }
-  if(currentChannel==="global")renderGlobalMembers();
-}
-function renderGlobalMembers(){
-  if(currentChannel!=="global")return;
-  $("member").classList.remove("hidden");
-  $("member").querySelector(".section").textContent="PUBLIC MEMBERS";
-  const box=$("members");
-  box.innerHTML="";
-  const publicUsers=globalMemberUsers.filter(u=>u===session.username||profileCache[u]);
-
-  if(!publicUsers.length){
-    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No public profiles in global yet.</div>';
-    return;
-  }
-
-  publicUsers.forEach(u=>{
-    const p=profileCache[u]||{};
-    const b=document.createElement("button");
-    b.className="nav";
-    const status=p.status||"";
-    b.innerHTML=`<span>• @${esc(u)}</span>${status?`<span style="font-size:10px;color:var(--sub)">${esc(status)}</span>`:""}`;
-    b.title="View profile";
-    b.onclick=()=>viewProfile(u);
-    box.appendChild(b);
-  });
-}
-function renderMessages(msgs){
-  const box=$("messages");
-  const oldScroll=box.scrollTop;
-  box.dataset.previousScroll=oldScroll;
-  box.innerHTML="";
-  msgs.forEach((m,i)=>{
-    if(blocked.includes(m.sender))return;
-    let text=m.text||"",reply="";
-    if(text.startsWith("↳ Replying to")){
-      const p=text.split("\n");reply=`<div class="reply-preview">${esc(p[0])}</div>`;text=p.slice(1).join("\n");
-    }
-    const div=document.createElement("div");div.className="msg"+(text.includes("@"+session.username)?" ping":"");
-    const a=document.createElement("span");a.className="author";a.textContent=m.sender;a.style.color=m.name_color||"#CBA6F7";a.onclick=()=>viewProfile(m.sender);
-    const head=document.createElement("div");head.appendChild(a);
-    div.innerHTML=reply;div.appendChild(head);
-    const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body);
-    div.oncontextmenu=e=>{e.preventDefault();messageMenu(e,m.sender,text,m.id??i,!!m.is_owner)};$("messages").appendChild(div);
-  });
-  if(oldScroll>=0 && box.scrollHeight-box.clientHeight-oldScroll<80)box.scrollTop=box.scrollHeight;
-  else box.scrollTop=oldScroll;
-}
-function messageMenu(e,sender,text,id,owner){
-  const items=[["Reply",()=>setReply(sender,text)]];
-  if(sender===session.username||owner)items.push(["🗑 Delete Message",()=>deleteMessage(id)]);
-  showMenu(e.clientX,e.clientY,items);
-}
-function showMenu(x,y,items){
-  document.querySelectorAll(".popup").forEach(x=>x.remove());
-  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px #0008`;
-  items.forEach(([t,fn])=>{const b=document.createElement("button");b.className="nav";b.textContent=t;b.onclick=()=>{d.remove();fn()};d.appendChild(b)});document.body.appendChild(d);
-}
-document.addEventListener("click",()=>document.querySelectorAll(".popup").forEach(x=>x.remove()));
-function setReply(sender,text){const clean=text.split("\n")[0].slice(0,45)+(text.length>45?"...":"");replyTarget={sender,text:clean};$("replytext").textContent=`Replying to @${sender}: "${clean}"`;$("replybar").classList.remove("hidden");$("message").focus()}
-function cancelReply(){replyTarget=null;$("replybar").classList.add("hidden")}
-async function send(){
-  let text=$("message").value.trim();if(!text||currentChannel==="friends_tab")return;
-  $("message").value="";
-  if(replyTarget)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
-  let ch=currentChannel;if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
-  cancelReply();const r=await api("send_message",{username:session.username,token:session.token,channel:ch,text});
-  if(r.status==="error")alert(r.message||"Failed to send message.");poll();
-}
-async function deleteMessage(id){const r=await api("delete_message",{username:session.username,token:session.token,msg_id:id});if(r.status!=="success")alert(r.message||"Could not delete message.");poll()}
-function friendsTab(){switchChannel("friends_tab");$("messages").innerHTML="<h2 style='color:var(--purple)'>=== FRIENDS HUB ===</h2>"+friends.map(f=>`<button class="nav">• @${esc(f.username)} — Status: ${esc(f.status||"Offline")}</button>`).join("")}
-function setupEmoji(){EMOTICONS.forEach(e=>{const b=document.createElement("button");b.className="small";b.style.cssText="background:var(--input);color:var(--text)";b.textContent=e;b.onclick=()=>{$("message").value+=e;$("emoji").classList.add("hidden")};$("emoji").appendChild(b)})}
-function toggleEmoji(){$("emoji").classList.toggle("hidden")}
-function openModal(content){$("modal").innerHTML=content;$("overlay").classList.remove("hidden")}
-function closeModal(e){if(!e||e.target===$("overlay"))$("overlay").classList.add("hidden")}
-async function addFriend(){
-  const target=prompt("Enter username to add:");if(!target)return;
-  const r=await api("send_friend_request",{username:session.username,token:session.token,target:target.trim()});
-  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));poll();
-}
-async function createServer(){
-  const raw=prompt("Enter Server Name:");
-  if(raw===null)return;
-  const name=raw.trim();
-  if(!name)return alert("Server name cannot be empty.");
-  if(name.length>80)return alert("Server name is too long (max 80 characters).");
-  const r=await api("create_server",{username:session.username,token:session.token,name});
-  if(r.status==="success"){
-    alert(`Server '${name}' created!`);await poll();
-  }else{
-    alert(`Could not create server.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
+    document.exitFullscreen?.();
   }
 }
-async function createChannel(){
-  if(!currentServerId)return;
-  const raw=prompt("Enter channel name:");
-  if(raw===null)return;
-  const cname=raw.trim().toLowerCase().replace(/\s+/g,"-");
-  if(!cname)return alert("Channel name cannot be empty.");
-  if(cname.length>80)return alert("Channel name is too long (max 80 characters).");
-  const r=await api("create_server_channel",{username:session.username,token:session.token,server_id:currentServerId,channel_name:cname});
-  if(r.status==="success"){alert("Channel created!");await poll();}
-  else alert(`Could not create channel.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
-}
-async function deleteChannel(){
-  if(!currentServerId||currentChannel.endsWith("_general"))return alert("Cannot delete general channel or non-server channel.");
-  if(!confirm("Are you sure you want to delete this channel?"))return;
-  const r=await api("delete_server_channel",{username:session.username,token:session.token,server_id:currentServerId,channel:currentChannel});
-  if(r.status==="success"){alert("Channel deleted.");switchChannel("global")}else alert(r.message||"Could not delete channel.");
-}
-async function discover(){
-  const r=await api("get_public_servers",{username:session.username,token:session.token});const pub=r.servers||[];
-  const p=await api("get_discover_profiles",{username:session.username,token:session.token});const people=p.profiles||[];
-  openModal(`<h2>Discover — Servers & People</h2>
-    <input id="discoverSearch" placeholder="Search...">
-    <h3>Servers</h3><div id="discoverServers">${pub.map(s=>`<div class="card"><span>${esc(s.name)}</span><button class="small" style="background:var(--green);color:#111" onclick="joinServer(${s.id})">Join</button></div>`).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
-    <hr><h3>People</h3><div id="discoverPeople">${people.map(x=>`<div class="card"><span>@${esc(x.username)} (${esc(x.status||"Offline")})</span><button class="small primary" onclick="sendDiscover('${esc(x.username)}')">+ Add Friend</button></div>`).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`);
-}
-async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:id});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
-async function sendDiscover(u){const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));}
-async function requests(){
-  openModal(`<h2>Friend Requests</h2><div id="requestList">${requestsList.length?requestsList.map(u=>`<div class="card"><span>@${esc(u)}</span><span><button class="small" style="background:var(--green);color:#111" onclick="respond('${esc(u)}','accept')">Accept</button> <button class="small" style="background:var(--red);color:#111" onclick="respond('${esc(u)}','decline')">Decline</button></span></div>`).join(""):"<span style='color:var(--sub)'>No pending requests.</span>"}</div>`);
-}
-async function respond(u,action){await api("respond_friend_request",{username:session.username,token:session.token,sender:u,action});closeModal();poll()}
-async function serverSettings(){
-  const s=servers.find(x=>x.id===currentServerId);if(!s)return;
-  if(s.owner!==session.username)return alert("Only the server owner can modify these settings.");
-  openModal(`<h2>Server Management</h2>
-    <button class="btn secondary" onclick="togglePublic()">Toggle Public / Private Visibility</button>
-    <button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation (Everyone vs Owner)</button>
-    <button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
-}
-async function togglePublic(){const r=await api("toggle_server_public",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||"Updated!");poll()}
-async function toggleCreation(){const r=await api("toggle_channel_creation_perm",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||`Channel creation set to: ${r.channel_creation_perm||"everyone"}`);poll()}
-async function deleteServer(){
-  openModal(`<h2 style="color:var(--red)">Delete Server</h2><p style="margin-bottom:10px">Enter password twice to delete.</p><input id="del1" type="password" placeholder="Password"><input id="del2" type="password" placeholder="Confirm Password"><button class="btn" style="background:var(--red);color:#111" onclick="confirmDeleteServer()">Delete Server Permanently</button>`);
-}
-async function confirmDeleteServer(){
-  const r=await api("delete_server",{username:session.username,token:session.token,server_id:currentServerId,pass1:$("del1").value,pass2:$("del2").value});
-  if(r.status==="success"){alert("Server deleted.");closeModal();switchChannel("global");poll()}else alert(r.message||"Failed to delete server.");
-}
-async function settings(){
-  const st=settingsData();
-  openModal(`<h2>Style & Settings</h2>
-    <label>Username Color</label><input id="nameColor" type="color" value="${profile.name_color}">
-    <label>Avatar Color</label><input id="avatarColor" type="color" value="${profile.avatar_color}">
-    <label>Banner Color</label><input id="bannerColor" type="color" value="${profile.banner_color}">
-    <label>Font Family</label><input id="font" value="${esc(profile.font_family)}">
-    <label>Status Preset</label><input id="status" value="${esc(profile.status_msg)}">
-    <label>Bio</label><textarea id="bio">${esc(profile.bio)}</textarea>
-    <button class="btn secondary" onclick="toggleProfile()">Toggle Public Profile (Discoverability)</button>
-    <button class="btn secondary" onclick="copyUsername()">📋 Copy My Username</button>
-    <label class="checkbox"><input id="autoSet" type="checkbox" ${st.auto_login?"checked":""}> Auto Login on Startup</label>
-    <button class="btn primary" onclick="saveSettings()">Save Profile & Settings</button>`);
-}
-async function toggleProfile(){const r=await api("toggle_profile_public",{username:session.username,token:session.token});alert(r.message||"Updated profile visibility.")}
-async function copyUsername(){
-  try{await navigator.clipboard.writeText(session.username);alert(`Copied @${session.username}`)}
-  catch{alert(`Your username is @${session.username}`)}
-}
-async function saveSettings(){
-  profile.name_color=$("nameColor").value;profile.avatar_color=$("avatarColor").value;profile.banner_color=$("bannerColor").value;
-  profile.font_family=$("font").value.trim()||"Segoe UI";profile.status_msg=$("status").value.trim()||"Online";profile.bio=$("bio").value.trim();
-  localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("autoSet").checked}));
-  await api("update_profile",{username:session.username,token:session.token,status:profile.status_msg,bio:profile.bio,name_color:profile.name_color,avatar_color:profile.avatar_color,banner_color:profile.banner_color,font_family:profile.font_family});
-  closeModal();poll();
-}
-async function viewProfile(target){
-  const r=await api("get_user_profile",{username:session.username,token:session.token,target});
-  if(r.status!=="success")return alert("Could not fetch profile.");
-  const p=r.profile||{};
-  openModal(`<div class="profile-banner" style="background:${esc(p.banner_color||"#313244")}"></div>
-    <h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2>
-    <div class="status">Status: ${esc(p.status||"Offline")}</div>
-    <div class="bio">${esc(p.bio||"No bio provided.")}</div>
-    ${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:""}`);
-}
-async function unfriend(u){await api("unfriend_user",{username:session.username,token:session.token,target:u});alert(`Removed @${u} from friends.`);closeModal();poll()}
-async function block(u){await api("block_user",{username:session.username,token:session.token,target:u});alert(`Blocked @${u}.`);closeModal();poll()}
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){
-    document.querySelectorAll(".popup").forEach(x=>x.remove());
-    if(!$('overlay').classList.contains('hidden'))closeModal();
-    if(replyTarget)cancelReply();
-  }
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){
-    e.preventDefault();
-    if(!$('app').classList.contains('hidden')){$('search').focus();$('search').select();}
-  }
+document.addEventListener("fullscreenchange",()=>{
+  const b=document.getElementById("fullscreenBtn");
+  if(b) b.textContent=document.fullscreenElement ? "⤢ exit fullscreen" : "⛶ fullscreen";
 });
 </script>
 </body>
