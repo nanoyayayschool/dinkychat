@@ -3,255 +3,173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dinky Chat — Chat Your Way</title>
+<meta name="theme-color" content="#0b0b12">
+<meta name="description" content="Dinky Chat — a privacy-focused place to chat, create communities, and customize everything.">
+<title>Dinky Chat — chat your way</title>
 <style>
 :root{
-  --bg:#0f0f17;--surface:#181825;--surface2:#1e1e2e;--hover:#313244;
-  --purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;--red:#f38ba8;
-  --text:#cdd6f4;--sub:#a6adc8;
+  --bg:#08080d;--panel:#101018;--panel2:#151522;--line:#ffffff12;
+  --text:#f7f5ff;--muted:#a9a5b8;--accent:#cba6f7;--accent2:#89dceb;
+  --glow:#cba6f744;--radius:22px;--max:1180px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
-a{text-decoration:none;color:inherit}
-button{font:inherit;cursor:pointer}
-.navbar{
-  position:fixed;top:0;left:0;right:0;z-index:50;
-  padding:18px 6%;display:flex;align-items:center;justify-content:space-between;
-  background:#0f0f17cc;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff0d
-}
-.logo{font-weight:900;letter-spacing:.5px;color:var(--purple);font-size:20px}
-.logo span{color:var(--text)}
-.navlinks{display:flex;gap:26px;color:var(--sub);font-size:14px}
-.navlinks a:hover{color:var(--text)}
-.navbtn{padding:9px 16px;border-radius:8px;background:var(--purple);color:#11111b;font-weight:800}
-.hero{
-  min-height:100vh;padding:150px 6% 80px;display:grid;grid-template-columns:1.05fr .95fr;
-  gap:60px;align-items:center;position:relative;overflow:hidden
-}
-.glow{position:absolute;width:500px;height:500px;border-radius:50%;filter:blur(120px);opacity:.18;pointer-events:none}
-.glow.one{background:var(--purple);top:-180px;left:-160px}
-.glow.two{background:var(--blue);right:-180px;bottom:-180px}
-.badge{
-  display:inline-block;padding:7px 12px;border:1px solid #cba6f733;border-radius:999px;
-  color:var(--purple);background:#cba6f70b;font-size:12px;font-weight:800;margin-bottom:20px
-}
-h1{font-size:clamp(48px,7vw,86px);line-height:.95;letter-spacing:-4px;max-width:750px}
-.gradient{background:linear-gradient(100deg,var(--purple),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{font-size:18px;line-height:1.7;color:var(--sub);max-width:620px;margin:25px 0 30px}
-.buttons{display:flex;gap:12px;flex-wrap:wrap}
-.primary,.secondary{padding:13px 20px;border-radius:9px;font-weight:800;border:1px solid transparent}
-.primary{background:var(--purple);color:#11111b}
-.secondary{background:var(--surface2);border-color:#ffffff12}
-.primary:hover,.secondary:hover{transform:translateY(-2px)}
-.preview{
-  background:var(--surface);border:1px solid #ffffff12;border-radius:16px;
-  box-shadow:0 30px 80px #0008;overflow:hidden;transform:rotate(1deg)
-}
-.windowbar{height:42px;background:var(--surface2);display:flex;align-items:center;gap:7px;padding:0 14px}
-.dot{width:9px;height:9px;border-radius:50%;background:#ffffff33}
-.previewbody{display:grid;grid-template-columns:120px 1fr 100px;min-height:380px}
-.pside{background:#11111b;padding:16px 10px}.pchat{padding:16px}.pmembers{background:#11111b;padding:16px 10px}
-.mini-title{font-size:9px;text-transform:uppercase;color:var(--purple);font-weight:900;margin-bottom:9px}
-.mini-item{padding:8px;font-size:10px;color:var(--sub);border-radius:5px;margin-bottom:3px}
-.mini-item.active{background:var(--hover);color:var(--text)}
-.chathead{font-weight:900;color:var(--purple);padding-bottom:15px;border-bottom:1px solid #fff1}
-.msg{padding:13px 0;border-bottom:1px solid #fff0}
-.msg strong{font-size:11px}.msg p{font-size:10px;color:var(--sub);margin-top:4px;line-height:1.5}
-.member{font-size:9px;color:var(--sub);padding:7px 0}
-section{padding:95px 6%}
-.section-head{text-align:center;max-width:700px;margin:0 auto 50px}
-.kicker{color:var(--purple);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:2px}
-h2{font-size:42px;letter-spacing:-1.5px;margin:10px 0 14px}
-.section-head p{color:var(--sub);line-height:1.7}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1100px;margin:auto}
-.card{
-  background:var(--surface);border:1px solid #ffffff0d;border-radius:13px;padding:25px;
-  transition:.2s
-}
-.card:hover{transform:translateY(-5px);border-color:#cba6f733}
-.icon{font-size:27px;margin-bottom:18px}
-.card h3{font-size:18px;margin-bottom:9px}.card p{font-size:14px;line-height:1.7;color:var(--sub)}
-.demo{background:linear-gradient(180deg,var(--bg),#151522)}
-.steps{max-width:900px;margin:auto;display:grid;gap:12px}
-.step{display:grid;grid-template-columns:50px 1fr;gap:18px;align-items:start;background:var(--surface);padding:22px;border-radius:12px;border:1px solid #fff1}
-.num{width:40px;height:40px;border-radius:10px;background:var(--purple);color:#11111b;display:grid;place-items:center;font-weight:900}
-.step p{color:var(--sub);line-height:1.6;margin-top:5px}
-.cta{text-align:center;padding:110px 6%;border-top:1px solid #fff1}
-.cta p{color:var(--sub);margin:15px auto 25px;max-width:550px;line-height:1.7}
-footer{padding:25px 6%;border-top:1px solid #fff1;color:var(--sub);font-size:12px;display:flex;justify-content:space-between}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:
+ radial-gradient(circle at 15% 10%,#cba6f712,transparent 28%),
+ radial-gradient(circle at 85% 20%,#89dceb0d,transparent 28%),
+ var(--bg);color:var(--text);font-family:Inter,Segoe UI,system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+.nav{position:fixed;z-index:20;top:16px;left:50%;transform:translateX(-50%);
+ width:min(calc(100% - 28px),var(--max));padding:10px 12px;
+ display:flex;align-items:center;justify-content:space-between;
+ background:#101018cc;border:1px solid var(--line);backdrop-filter:blur(18px);
+ border-radius:18px;box-shadow:0 14px 50px #0007}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.5px}
+.logo{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+ background:linear-gradient(135deg,var(--accent),#9b8cff);color:#16121e;
+ box-shadow:0 0 28px var(--glow)}
+.navlinks{display:flex;gap:4px}.navlinks a{padding:9px 12px;border-radius:11px;color:var(--muted);font-size:14px}
+.navlinks a:hover{background:#ffffff0a;color:var(--text)}
+.navcta{padding:10px 15px;border:0;border-radius:12px;background:var(--accent);color:#17111f;font-weight:800;cursor:pointer}
+.hero{min-height:850px;display:grid;place-items:center;padding:130px 20px 80px;position:relative}
+.hero-inner{width:min(100%,var(--max));display:grid;grid-template-columns:1.05fr .95fr;gap:55px;align-items:center}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;padding:8px 11px;border:1px solid #cba6f733;
+ background:#cba6f70d;border-radius:999px;color:#dec9f7;font-size:13px;font-weight:700}
+.dot{width:7px;height:7px;border-radius:50%;background:#a6e3a1;box-shadow:0 0 12px #a6e3a1}
+h1{font-size:clamp(54px,8vw,100px);line-height:.9;letter-spacing:-6px;margin:20px 0}
+.gradient{background:linear-gradient(100deg,#fff 10%,#cba6f7 55%,#89dceb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:650px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.primary,.secondary{padding:14px 19px;border-radius:14px;font-weight:850;border:1px solid var(--line);cursor:pointer}
+.primary{background:var(--accent);color:#18121e;box-shadow:0 10px 35px #cba6f722}
+.secondary{background:#ffffff08;color:var(--text)}
+.stats{display:flex;gap:22px;margin-top:30px;color:var(--muted);font-size:13px}
+.stats b{display:block;color:var(--text);font-size:15px;margin-bottom:3px}
+.mock-wrap{position:relative}
+.mock-glow{position:absolute;inset:8% -8%;background:var(--glow);filter:blur(55px);border-radius:50%}
+.mock{position:relative;background:#11111a;border:1px solid #ffffff18;border-radius:25px;
+ box-shadow:0 35px 100px #000b,0 0 70px #cba6f712;overflow:hidden;transform:rotate(1.2deg)}
+.mock-top{height:48px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 15px;gap:7px}
+.circle{width:9px;height:9px;border-radius:50%;background:#ffffff20}
+.mock-body{display:grid;grid-template-columns:65px 1fr 130px;height:390px}
+.servers{background:#0c0c12;padding:12px 10px;display:flex;flex-direction:column;gap:10px}
+.srv{width:42px;height:42px;border-radius:13px;background:#1d1d2a;display:grid;place-items:center;color:#cba6f7;font-weight:900}
+.srv.active{background:var(--accent);color:#15101c}
+.chat{padding:20px;display:flex;flex-direction:column;justify-content:flex-end;gap:13px}
+.msg{display:flex;gap:9px}.avatar{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,#cba6f7,#89dceb);flex:none}
+.bubble{background:#ffffff08;border:1px solid #ffffff0b;border-radius:12px;padding:9px 11px;color:#ddd8e8;font-size:13px}
+.bubble b{display:block;color:#fff;margin-bottom:3px;font-size:12px}
+.members{background:#0c0c12;border-left:1px solid var(--line);padding:15px}
+.member{height:33px;display:flex;align-items:center;gap:7px;color:#aaa5b5;font-size:11px}
+.miniavatar{width:20px;height:20px;border-radius:7px;background:#2a2938}
+.section{padding:100px 20px}.section-inner{width:min(100%,var(--max));margin:auto}
+.kicker{color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:2px;font-weight:900}
+h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
+.lead{color:var(--muted);font-size:17px;line-height:1.7;max-width:700px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.card{padding:25px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,#ffffff07,#ffffff02);
+ transition:.25s;min-height:210px}.card:hover{transform:translateY(-5px);border-color:#cba6f733;box-shadow:0 18px 55px #0005}
+.icon{font-size:27px}.card h3{margin:18px 0 8px}.card p{color:var(--muted);line-height:1.6;font-size:14px}
+.showcase{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:42px}
+.big-card{min-height:330px;padding:30px;border:1px solid var(--line);border-radius:28px;background:radial-gradient(circle at 80% 20%,#cba6f714,transparent 35%),#ffffff04}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}.pill{padding:8px 11px;border-radius:999px;background:#ffffff09;border:1px solid #ffffff10;color:#cfc9dc;font-size:12px}
+.cta{padding:110px 20px}.cta-box{width:min(100%,var(--max));margin:auto;text-align:center;padding:75px 25px;border:1px solid #cba6f733;border-radius:32px;
+ background:radial-gradient(circle at 50% 0,#cba6f71b,transparent 48%),#ffffff04;box-shadow:0 30px 100px #0006}
+.cta-box p{color:var(--muted);max-width:600px;margin:0 auto;line-height:1.7}
+.footer{padding:30px 20px 45px;color:#777184;font-size:12px;text-align:center}
+#chat-app{padding:80px 20px 20px}.chat-head{width:min(100%,var(--max));margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px}
+.chat-frame{width:min(100%,var(--max));height:720px;margin:auto;border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 25px 90px #0008;background:#0f0f17}
+.chat-frame iframe{width:100%;height:100%;border:0}
+.hidden{display:none}
 @media(max-width:850px){
-  .navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:130px}.preview{max-width:650px}
-  .features{grid-template-columns:1fr}h2{font-size:34px}
+ .navlinks{display:none}.hero{min-height:auto;padding-top:120px}.hero-inner{grid-template-columns:1fr;gap:35px}
+ h1{letter-spacing:-4px}.mock-body{grid-template-columns:55px 1fr}.members{display:none}
+ .features,.showcase{grid-template-columns:1fr}.section{padding:75px 18px}.stats{flex-wrap:wrap}
+ .chat-frame{height:78vh;border-radius:17px}.chat-head{align-items:flex-start;flex-direction:column}
 }
-@media(max-width:520px){.previewbody{grid-template-columns:80px 1fr}.pmembers{display:none}h1{letter-spacing:-2px}.hero{padding-left:5%;padding-right:5%}section{padding-left:5%;padding-right:5%}}
-
-.chat-app{padding:95px 6%;background:#0b0b12;border-top:1px solid #fff1}
-.chat-frame-wrap{
-  max-width:1400px;margin:auto;background:#11111b;border:1px solid #ffffff18;
-  border-radius:14px;overflow:hidden;box-shadow:0 30px 90px #0009
-}
-.chat-framebar{
-  height:42px;background:var(--surface2);display:flex;align-items:center;
-  justify-content:space-between;padding:0 14px;font-size:12px;color:var(--sub)
-}
-.chat-framebar .frame-actions{display:flex;gap:7px;align-items:center}
-.chat-framebar button,.chat-framebar a{
-  border:0;border-radius:6px;padding:6px 10px;background:var(--hover);
-  color:var(--text);font-size:11px;text-decoration:none;cursor:pointer
-}
-.chat-framebar button:hover,.chat-framebar a:hover{background:#ffffff18}
-#dinkyFrame{display:block;width:100%;height:760px;border:0;background:var(--bg)}
-@media(max-width:700px){#dinkyFrame{height:700px}.chat-app{padding-left:3%;padding-right:3%}}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a class="logo" href="#">DINKY <span>CHAT</span></a>
-  <div class="navlinks">
-    <a href="#features">features</a>
-    <a href="#how">how it works</a>
-    <a href="#about">about</a>
-  </div>
-  <a class="navbtn" href="DinkyChat_fixed.html" target="_blank" rel="noopener">open chat ↗</a>
+<nav class="nav">
+ <a class="brand" href="#top"><span class="logo">✦</span><span>dinky chat</span></a>
+ <div class="navlinks"><a href="#features">features</a><a href="#custom">customize</a><a href="#chat-app">try it</a></div>
+ <button class="navcta" onclick="openChat()">Open Chat ↗</button>
 </nav>
 
-<main>
+<main id="top">
 <section class="hero">
-  <div class="glow one"></div><div class="glow two"></div>
+ <div class="hero-inner">
   <div>
-    <span class="badge">🔒 privacy focused • social • dinky</span>
-    <h1>the first <span class="gradient">privacy-focused</span><br>chatting app.</h1>
-    <p>
-      dinky chat is a lightweight social chat platform built around servers,
-      channels, friends and profiles — with a clean interface that gets out of your way.
-    </p>
-    <div class="buttons">
-      <a class="primary" href="DinkyChat_fixed.html" target="_blank" rel="noopener">launch dinky chat ↗</a>
-      <a class="secondary" href="#features">see what's inside ↓</a>
-    </div>
+   <div class="eyebrow"><span class="dot"></span> built for communities</div>
+   <h1>chat.<br><span class="gradient">your way.</span></h1>
+   <p>Dinky Chat is a privacy-focused chatting app where servers, profiles, themes and communities are yours to customize — without locking the fun behind a paywall.</p>
+   <div class="actions">
+    <button class="primary" onclick="openChat()">Open Dinky Chat ↗</button>
+    <a class="secondary" href="#features">See what's inside ↓</a>
+   </div>
+   <div class="stats"><span><b>∞</b>your communities</span><span><b>🎨</b>custom themes</span><span><b>📎</b>file sharing</span></div>
   </div>
-
-  <div class="preview" aria-label="dinky chat interface preview">
-    <div class="windowbar"><i class="dot"></i><i class="dot"></i><i class="dot"></i></div>
-    <div class="previewbody">
-      <aside class="pside">
-        <div class="mini-title">channels</div>
-        <div class="mini-item active"># global-chat</div>
-        <div class="mini-item">👥 friends</div>
-        <div class="mini-title" style="margin-top:18px">servers</div>
-        <div class="mini-item">🏠 dinky hub</div>
-        <div class="mini-item">🏠 gaming</div>
-      </aside>
-      <div class="pchat">
-        <div class="chathead"># global-chat</div>
-        <div class="msg"><strong style="color:#cba6f7">dinky</strong><p>yo, welcome to dinky chat 👋</p></div>
-        <div class="msg"><strong style="color:#89b4fa">pixel</strong><p>this ui is actually kinda clean ngl</p></div>
-        <div class="msg"><strong style="color:#a6e3a1">bob</strong><p>we are so back.</p></div>
-      </div>
-      <aside class="pmembers">
-        <div class="mini-title">members</div>
-        <div class="member">• @dinky</div><div class="member">• @pixel</div><div class="member">• @bob</div>
-      </aside>
+  <div class="mock-wrap">
+   <div class="mock-glow"></div>
+   <div class="mock">
+    <div class="mock-top"><span class="circle"></span><span class="circle"></span><span class="circle"></span><span style="margin-left:8px;color:#aaa;font-size:12px"># general</span></div>
+    <div class="mock-body">
+     <div class="servers"><div class="srv active">D</div><div class="srv">✦</div><div class="srv">+</div></div>
+     <div class="chat">
+      <div class="msg"><div class="avatar"></div><div class="bubble"><b>dinky</b>yo this server looks CLEAN ✨</div></div>
+      <div class="msg"><div class="avatar"></div><div class="bubble"><b>bob</b>we can customize basically everything :3</div></div>
+      <div class="msg"><div class="avatar"></div><div class="bubble"><b>you</b>WAIT THAT'S ACTUALLY SICK</div></div>
+     </div>
+     <div class="members"><div style="color:#777;font-size:10px;margin-bottom:9px">MEMBERS — 3</div><div class="member"><span class="miniavatar"></span>dinky</div><div class="member"><span class="miniavatar"></span>bob</div><div class="member"><span class="miniavatar"></span>you</div></div>
     </div>
+   </div>
   </div>
+ </div>
 </section>
 
-<section id="features">
-  <div class="section-head">
-    <span class="kicker">what's inside</span>
-    <h2>small app. big chat energy.</h2>
-    <p>everything you need for a casual community chat, without turning the screen into a cockpit.</p>
-  </div>
+<section class="section" id="features">
+ <div class="section-inner">
+  <div class="kicker">everything included</div>
+  <h2>not just another chat box.</h2>
+  <p class="lead">Build a place that actually feels like yours. Dinky Chat brings the community features together while keeping the interface simple.</p>
   <div class="features">
-    <article class="card"><div class="icon">🏠</div><h3>servers & channels</h3><p>Create servers, add channels, switch between conversations, and manage your own community spaces.</p></article>
-    <article class="card"><div class="icon">👥</div><h3>friends & dms</h3><p>Add friends, accept requests, open direct messages, and keep your social circle in one place.</p></article>
-    <article class="card"><div class="icon">🎨</div><h3>your profile</h3><p>Customise your username colour, status, bio, banner and font to give your profile some personality.</p></article>
-    <article class="card"><div class="icon">🔎</div><h3>discover</h3><p>Find public servers and discover people who have chosen to make their profiles discoverable.</p></article>
-    <article class="card"><div class="icon">↩️</div><h3>replies</h3><p>Reply to messages, keep conversations understandable, and jump back into the context of a chat.</p></article>
-    <article class="card"><div class="icon">🙂</div><h3>little quality-of-life things</h3><p>Emoji shortcuts, message controls, keyboard search, auto-growing messages and more.</p></article>
+   <article class="card"><div class="icon">🏠</div><h3>Custom servers</h3><p>Server icons, banners, descriptions, colours, tags, channels, roles and more — shape your community however you want.</p></article>
+   <article class="card"><div class="icon">🎨</div><h3>Themes for everyone</h3><p>Pick a preset or create your own palette. Your look is saved on your device and doesn't need a premium tier.</p></article>
+   <article class="card"><div class="icon">🪪</div><h3>Profiles</h3><p>Give your profile an avatar, banner, bio, colours and personal style so people know who they're talking to.</p></article>
+   <article class="card"><div class="icon">📎</div><h3>Send files</h3><p>Share images and files right inside conversations with previews and tidy download cards.</p></article>
+   <article class="card"><div class="icon">🔎</div><h3>Discovery</h3><p>Find public communities and public profiles, then connect with people without leaving Dinky Chat.</p></article>
+   <article class="card"><div class="icon">📱</div><h3>Actually mobile</h3><p>The interface adapts to smaller screens with mobile navigation, drawers and touch-friendly controls.</p></article>
   </div>
+ </div>
 </section>
 
-<section class="demo" id="how">
-  <div class="section-head">
-    <span class="kicker">get started</span>
-    <h2>three clicks away from yapping.</h2>
-    <p>the complicated bit is handled by the app. you just show up.</p>
+<section class="section" id="custom">
+ <div class="section-inner">
+  <div class="kicker">make it yours</div>
+  <h2>customization goes hard.</h2>
+  <p class="lead">Dinky Chat is designed around the idea that customization should be part of the app — not a prize you unlock.</p>
+  <div class="showcase">
+   <div class="big-card"><div class="icon">🎨</div><h3>Theme the whole vibe</h3><p class="lead" style="font-size:14px">Dark, ocean, forest, sunset, lavender, mono — or build your own colour system.</p><div class="pills"><span class="pill">background</span><span class="pill">panels</span><span class="pill">accent</span><span class="pill">text</span><span class="pill">hover</span></div></div>
+   <div class="big-card"><div class="icon">🛠️</div><h3>Build your community</h3><p class="lead" style="font-size:14px">Create channels, customize the server, manage members and shape the way your space works.</p><div class="pills"><span class="pill">roles</span><span class="pill">channels</span><span class="pill">server profile</span><span class="pill">discovery</span></div></div>
   </div>
-  <div class="steps">
-    <div class="step"><div class="num">1</div><div><h3>create an account</h3><p>Choose a username and password, then log in to your dinky chat account.</p></div></div>
-    <div class="step"><div class="num">2</div><div><h3>find your people</h3><p>Add friends, browse discoverable profiles, or join a public server.</p></div></div>
-    <div class="step"><div class="num">3</div><div><h3>start chatting</h3><p>Pick a channel or DM and start sending messages. revolutionary technology, apparently.</p></div></div>
-  </div>
+ </div>
 </section>
 
-<section id="about">
-  <div class="section-head">
-    <span class="kicker">about dinky chat</span>
-    <h2>made to feel simple.</h2>
-    <p>
-      dinky chat is designed as a straightforward social chat experience:
-      servers and channels for communities, friends and DMs for one-to-one conversations,
-      and custom profiles for a little extra personality.
-    </p>
-  </div>
-</section>
-
-
-<section id="chat-app" class="chat-app">
-  <div class="section-head">
-    <span class="kicker">dinky chat</span>
-    <h2>right here. full app included.</h2>
-    <p>you can use the full dinky chat experience directly inside this website, or open it separately for bookmarking.</p>
-  </div>
-  <div class="chat-frame-wrap">
-    <div class="chat-framebar">
-      <span>● dinky chat</span>
-      <div class="frame-actions">
-        <a href="DinkyChat_fixed.html" download="DinkyChat.html">⇩ download</a>
-        <button onclick="toggleFullscreen()" id="fullscreenBtn">⛶ fullscreen</button>
-        <button onclick="closeChat()">hide chat</button>
-      </div>
-    </div>
-    <iframe id="dinkyFrame" src="DinkyChat_fixed.html" title="Dinky Chat" loading="lazy"></iframe>
-  </div>
+<section id="chat-app">
+ <div class="chat-head"><div><div class="kicker">try it now</div><h2 style="margin:5px 0;font-size:38px">jump into dinky.</h2></div><button class="secondary" onclick="openChat()">Open in new tab ↗</button></div>
+ <div class="chat-frame"><iframe src="DinkyChat_themes.html" title="Dinky Chat"></iframe></div>
 </section>
 
 <section class="cta">
-  <span class="kicker">ready?</span>
-  <h2>come say hi.</h2>
-  <p>open dinky chat, make an account, and get yapping.</p>
-  <a class="primary" href="DinkyChat_fixed.html" target="_blank" rel="noopener">open dinky chat ↗</a>
+ <div class="cta-box"><div class="kicker">ready?</div><h2>your chat. your rules.</h2><p>Make a server. Pick a theme. Invite your people. Then make something ridiculously dinky.</p><div class="actions" style="justify-content:center"><button class="primary" onclick="openChat()">Open Dinky Chat ↗</button><a class="secondary" href="#top">Back to top ↑</a></div></div>
 </section>
 </main>
-
-<footer>
-  <span>© dinky chat</span>
-  <span>built with questionable amounts of caffeine ☕</span>
-</footer>
+<footer class="footer">dinky chat · made for communities · ✦</footer>
 
 <script>
-function openChat(e){
-  if(e)e.preventDefault();
-  const app=document.getElementById("chat-app");
-  app.scrollIntoView({behavior:"smooth",block:"start"});
+function openChat(){
+  window.open("DinkyChat_themes.html","_blank","noopener");
 }
-function closeChat(){
-  document.getElementById("features").scrollIntoView({behavior:"smooth",block:"start"});
-}
-function toggleFullscreen(){
-  const frame=document.getElementById("chat-app");
-  if(!document.fullscreenElement){
-    frame.requestFullscreen?.();
-  }else{
-    document.exitFullscreen?.();
-  }
-}
-document.addEventListener("fullscreenchange",()=>{
-  const b=document.getElementById("fullscreenBtn");
-  if(b) b.textContent=document.fullscreenElement ? "⤢ exit fullscreen" : "⛶ fullscreen";
-});
 </script>
 </body>
 </html>
