@@ -1,3 +1,4 @@
+```
 <!doctype html>
 <html lang="en">
 <head>
@@ -128,13 +129,41 @@ let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe 
 function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
 async function api(endpoint,data){
   try{
-    const r=await fetch(`${BASE_URL}/${endpoint}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    const r=await fetch(`${BASE_URL}/${endpoint}`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(data)
+    });
     const raw=await r.text();
     let out;
-    try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
-    if(r.ok){setConnection(true)}else{setConnection(false,`HTTP ${r.status}`)}
+    try{out=JSON.parse(raw)}
+    catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
+
+    if(r.status===401 && endpoint!=="login" && endpoint!=="register"){
+      handleAuthFailure();
+    }else if(r.ok){
+      setConnection(true);
+    }else{
+      setConnection(false,`HTTP ${r.status}`);
+    }
     return out;
-  }catch(e){setConnection(false,"offline");return {status:"error",message:"Connection error: "+e.message};}
+  }catch(e){
+    setConnection(false,"offline");
+    return {status:"error",message:"Connection error: "+e.message};
+  }
+}
+
+let authFailureShown=false;
+function handleAuthFailure(){
+  if(authFailureShown)return;
+  authFailureShown=true;
+  clearInterval(pollTimer);
+  localStorage.removeItem("dinky_session");
+  session=null;
+  $("app").classList.add("hidden");
+  $("auth-screen").classList.remove("hidden");
+  $("error").textContent="Your Dinky Chat session expired. Please log in again.";
+  setConnection(false,"HTTP 401");
 }
 function setConnection(ok,label){
   connected=ok;
@@ -156,8 +185,11 @@ async function login(){
   if(!username||!password)return error("Fill in all fields.");
   const r=await api("login",{username,password});
   if(r.status==="success"){
-    session=r;localStorage.setItem("dinky_session",JSON.stringify(r));
-    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));startApp();
+    authFailureShown=false;
+    session=r;
+    localStorage.setItem("dinky_session",JSON.stringify(r));
+    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));
+    startApp();
   }else error(r.message||"Login failed.");
 }
 async function register(){
@@ -494,3 +526,4 @@ document.addEventListener("keydown",e=>{
 </script>
 </body>
 </html>
+```
