@@ -62,7 +62,7 @@ button{cursor:pointer}
 .bio{background:var(--input);padding:9px;border-radius:5px;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 hr{border:0;border-top:1px solid var(--border);margin:12px 0}
 
-/* free custom themes */
+/* themes */
 .theme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 14px}
 .theme-card{border:2px solid transparent;background:var(--input);color:var(--text);border-radius:8px;padding:9px;text-align:left;cursor:pointer;transition:.15s}
 .theme-card:hover{border-color:var(--purple);transform:translateY(-1px)}
@@ -516,7 +516,7 @@ async function uploadChatFile(file){
   const fd=new FormData();fd.append("username",session.username);fd.append("token",session.token);fd.append("file",file);
   try{
     const r=await fetch(`${BASE_URL}/upload_chat_file`,{method:"POST",body:fd});
-    const raw=await r.text();let out;try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}` AuthHeader}}
+    const raw=await r.text();let out;try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
     if(r.status===401){handleAuthFailure();return {status:"error",message:"Your session expired. Please log in again."}}
     if(r.ok)setConnection(true);else setConnection(false,`HTTP ${r.status}`);
     return out;
@@ -609,21 +609,57 @@ async function deleteChannel(){
 async function discover(){
   const r=await api("get_public_servers",{username:session.username,token:session.token});
   const p=await api("get_discover_profiles",{username:session.username,token:session.token});
-  const pub=r.status==="success"?(r.servers||[]):[]; const people=p.status==="success"?(p.profiles||[]):[];
-  if(r.status!=="success"&&p.status!=="success")return alert(r.message||p.message||"Discovery is unavailable right now.");
-  openModal(`<h2>🔍 Discover</h2>
+  const pub=r.status==="success"?(r.servers||[]):[]; 
+  const people=p.status==="success"?(p.profiles||[]):[];
+  
+  if(r.status!=="success"&&p.status!=="success"){
+    return alert(r.message||p.message||"Discovery is unavailable right now.");
+  }
+
+  const serverCards = pub.length ? pub.map(s => `
+    <div class="card discover-item" data-search="${esc((s.name+' '+(s.description||'')+' '+(s.tags||[]).join(' ')).toLowerCase())}">
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        ${s.icon_url ? `<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}">` : "🌐"}
+        <div>
+          <b>${esc(s.name)}</b>
+          <div style="font-size:11px;color:var(--sub)">${esc(s.description||'Public server')} • ${s.members_count} member${s.members_count===1?'':'s'}</div>
+        </div>
+      </div>
+      <button class="small" style="background:var(--green);color:#111" onclick="joinServer('${esc(String(s.id))}')">Join</button>
+    </div>
+  `).join("") : "<span style='color:var(--sub)'>No public servers.</span>";
+
+  const peopleCards = people.length ? people.map(x => `
+    <div class="card discover-item" data-search="${esc((x.username+' '+(x.status||'')+' '+(x.bio||'')).toLowerCase())}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar small-avatar">${esc(x.username[0]||'?').toUpperCase()}</div>
+        <span>@${esc(x.username)} <small style="color:var(--sub)">${esc(x.status||"Offline")}</small></span>
+      </div>
+      <button class="small primary" onclick="sendDiscover('${esc(x.username)}')">+ Add Friend</button>
+    </div>
+  `).join("") : "<span style='color:var(--sub)'>No discoverable profiles.</span>";
+
+  openModal(`
+    <h2>🔍 Discover</h2>
     <input id="discoverSearch" placeholder="Search servers or people..." oninput="filterDiscover()">
-    <div id="discoverServers"><h3>Servers</h3>${pub.map(s=>`<div class="card discover-item" data-search="${esc((s.name+' '+(s.description||'')+' '+(s.tags||[]).join(' ')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px;flex:1">${s.icon_url?`<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}">`:"🌐"}<div><b>${esc(s.name)}</b><div style="font-size:11px;color:var(--sub)">${esc(s.description||'Public server')} • ${s.members_count} member${s.members_count===1?'':'s'}</div></div></div><button class="small" style="background:var(--green);color:#111" onclick="joinServer(${JSON.stringify(String(s.id))})">Join</button></div>`).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
-    <hr><div id="discoverPeople"><h3>People</h3>${people.map(x=>`<div class="card discover-item" data-search="${esc((x.username+' '+(x.status||'')+' '+(x.bio||'')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px"><div class="avatar small-avatar">${esc(x.username[0]\vert{}\vert{}'?').toUpperCase()}</div><span>@${esc(x.username)} <small style="color:var(--sub)">${esc(x.status||"Offline")}</small></span></div><button class="small primary" onclick="sendDiscover(${JSON.stringify(x.username)})">+ Add Friend</button></div>`).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`);
+    <div id="discoverServers"><h3>Servers</h3>${serverCards}</div>
+    <hr>
+    <div id="discoverPeople"><h3>People</h3>${peopleCards}</div>
+  `);
 }
 function filterDiscover(){const q=($('discoverSearch')?.value||'').toLowerCase().trim();document.querySelectorAll('.discover-item').forEach(x=>x.style.display=!q||x.dataset.search.includes(q)?'flex':'none')}
-async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:String(id)});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
+async function joinServer(id){
+  if(!id) return alert("Invalid server ID.");
+  const r=await api("join_public_server",{username:session.username,token:session.token,server_id:String(id)});
+  alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));
+  if(r.status==="success"){closeModal();poll();}
+}
 async function sendDiscover(u){
   u=String(u||"").trim();
-  if(!u||u===session.username)return alert("Please choose another user.");
+  if(!u||u===session.username) return alert("Please choose another user.");
   const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});
   alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));
-  if(r.status==="success")await poll();
+  if(r.status==="success") await poll();
 }
 async function requests(){
   openModal(`<h2>Friend Requests</h2><div id="requestList">${requestsList.length?requestsList.map(u=>`<div class="card"><span>@${esc(u)}</span><span><button class="small" style="background:var(--green);color:#111" onclick="respond('${esc(u)}','accept')">Accept</button> <button class="small" style="background:var(--red);color:#111" onclick="respond('${esc(u)}','decline')">Decline</button></span></div>`).join(""):"<span style='color:var(--sub)'>No pending requests.</span>"}</div>`);
