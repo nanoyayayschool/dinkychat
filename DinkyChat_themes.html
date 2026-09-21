@@ -10,7 +10,6 @@
   --hover:#313244;--purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;
   --red:#f38ba8;--orange:#fab387;--text:#cdd6f4;--sub:#a6adc8;
   --font:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
-  --border:#ffffff1a;--shadow:#00000088;--msg:#00000033;--reply:#2b2d31;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
@@ -18,7 +17,7 @@ button,input{font:inherit}
 .hidden{display:none!important}
 button{cursor:pointer}
 #auth-screen{height:100vh;display:flex;align-items:center;justify-content:center}
-.auth-card{width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px var(--shadow)}
+.auth-card{width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px #0008}
 .auth-card h1{text-align:center;color:var(--purple);font-size:24px}
 .auth-card p{text-align:center;color:var(--sub);font-size:13px;margin:4px 0 20px}
 .form-group{margin-bottom:12px}.form-group label{display:block;font-size:12px;font-weight:700;color:#bac2de;margin-bottom:4px}
@@ -29,28 +28,28 @@ button{cursor:pointer}
 .primary{background:var(--purple);color:#11111b}.secondary{background:var(--panel);color:var(--text)}
 #error{height:16px;color:var(--red);font-size:12px;margin-bottom:10px}
 #app{display:flex;width:100vw;height:100vh}
-.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid #fff0a}
 .search{padding:10px}.search input{width:100%;padding:7px 10px;background:var(--input);border:0;border-radius:4px;color:var(--text);outline:0}
 .scroll{flex:1;overflow:auto;padding:0 8px}.section{font-size:11px;font-weight:700;color:var(--purple);padding:8px 4px 4px;text-transform:uppercase}
 .nav{width:100%;border:0;border-radius:4px;background:transparent;color:var(--text);text-align:left;padding:8px 10px;font-size:13px;margin-bottom:2px}
 .nav:hover,.nav.active{background:var(--hover)}.nav.sub{padding-left:24px;font-size:12px;color:var(--sub)}
 .server-head{font-weight:700;font-size:12px;color:var(--purple);padding:4px 6px}
 .server-tools{display:flex;gap:4px;margin-bottom:6px}.small{padding:6px;border:0;border-radius:4px;font-size:11px;font-weight:700}
-.sidebar-actions{padding:8px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px}
+.sidebar-actions{padding:8px;border-top:1px solid #fff1;display:flex;flex-direction:column;gap:4px}
 .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg),var(--surface))}
-.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff1}
 .header-title{font-weight:700;color:var(--purple);font-size:16px}.header-status{font-size:11px;color:var(--sub);margin-left:10px}.actions{display:flex;gap:6px}
 .messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-.msg{background:var(--msg);padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
+.msg{background:#0002;padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
 .author{font-weight:700;font-size:14px;cursor:pointer}.msgtext{font-size:14px;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}
-.reply-preview{font-size:11px;color:var(--sub);border-left:2px solid var(--blue);padding-left:6px;margin-bottom:4px;font-style:italic}
-.replybar{background:var(--reply);padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}.file-card{margin-top:7px;max-width:min(520px,100%);background:var(--input);border:1px solid var(--border);border-radius:7px;padding:7px}.file-image{display:block;max-width:100%;max-height:320px;border-radius:5px;cursor:pointer}.file-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:12px}.file-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}.file-btn{min-width:40px;font-size:16px}.file-info{font-size:11px;color:var(--sub);position:absolute;left:16px;bottom:2px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reply-preview{font-size:11px;color:var(--sub);border-left:2px solid #5865f2;padding-left:6px;margin-bottom:4px;font-style:italic}
+.replybar{background:#2b2d31;padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}
+.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}
 .inputbar textarea{flex:1;padding:10px;background:var(--input);border:0;border-radius:6px;color:var(--text);outline:0;resize:none;min-height:40px;max-height:120px;line-height:20px}
-.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid var(--border);padding:12px;overflow:auto}
+.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid #fff1;padding:12px;overflow:auto}
 .member .section{padding-left:0}
-.emoji{position:absolute;bottom:60px;left:16px;background:var(--surface);border:1px solid var(--hover);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;box-shadow:0 4px 12px var(--shadow)}
-.modal-overlay{position:fixed;inset:0;background:var(--shadow);display:flex;align-items:center;justify-content:center;z-index:100}
+.emoji{position:absolute;bottom:60px;left:16px;background:var(--surface);border:1px solid var(--hover);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;box-shadow:0 4px 12px #0008}
+.modal-overlay{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:100}
 .modal{width:420px;max-width:92vw;max-height:85vh;overflow:auto;background:var(--panel);padding:20px;border-radius:8px}
 .modal h2,.modal h3{color:var(--purple);margin-bottom:12px}
 .modal input,.modal textarea{width:100%;background:var(--input);border:0;color:var(--text);padding:9px;border-radius:5px;outline:0;margin:4px 0 10px}
@@ -60,38 +59,8 @@ button{cursor:pointer}
 .profile-banner{height:55px;border-radius:5px;margin-bottom:10px}
 .status{color:var(--green);font-size:12px;margin-bottom:10px}
 .bio{background:var(--input);padding:9px;border-radius:5px;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}
-hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+hr{border:0;border-top:1px solid #fff1;margin:12px 0}
 @media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
-
-/* free custom themes */
-.theme-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:8px 0 14px}
-.theme-card{border:2px solid transparent;background:var(--input);color:var(--text);border-radius:8px;padding:9px;text-align:left;cursor:pointer;transition:.15s}
-.theme-card:hover{border-color:var(--purple);transform:translateY(-1px)}
-.theme-card.active{border-color:var(--purple);box-shadow:0 0 0 2px #cba6f733}
-.theme-swatch{height:30px;border-radius:5px;margin-bottom:7px;display:flex;overflow:hidden}
-.theme-swatch span{flex:1}
-.theme-name{font-size:12px;font-weight:700}
-.custom-theme-box{background:var(--input);padding:10px;border-radius:7px;margin-top:8px}
-.color-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.color-field label{display:block;font-size:10px;color:var(--sub);margin-bottom:3px}
-.color-field input[type=color]{width:100%;height:34px;border:0;border-radius:5px;background:transparent;padding:0;cursor:pointer}
-.theme-note{font-size:11px;color:var(--sub);line-height:1.4;margin:4px 0 10px}
-
-/* mobile + customization extras */
-.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;color:#111;background:var(--blue)}
-.avatar.small-avatar{width:28px;height:28px;font-size:11px}.profile-avatar{width:76px;height:76px;border-radius:50%;object-fit:cover;border:4px solid var(--surface);margin-top:-38px;background:var(--blue)}
-.server-icon{width:28px;height:28px;border-radius:9px;object-fit:cover;vertical-align:middle;background:var(--hover);margin-right:6px}.server-banner{height:130px;border-radius:10px 10px 0 0;background:linear-gradient(135deg,var(--accent,var(--purple)),var(--surface));background-size:cover;background-position:center}.server-custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.server-custom-grid .full{grid-column:1/-1}.theme-dropdown{position:relative}.theme-dropdown summary{list-style:none;cursor:pointer}.theme-dropdown summary::-webkit-details-marker{display:none}.theme-menu{position:absolute;bottom:42px;left:0;width:210px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;box-shadow:0 12px 30px var(--shadow);z-index:1000}.theme-menu button{width:100%;text-align:left;margin:2px 0}.mobile-only{display:none}
-@media (max-width:800px){
-  #app{grid-template-columns:1fr!important;position:relative;overflow:hidden}
-  .sidebar{position:fixed;left:0;top:0;bottom:0;width:min(88vw,330px);z-index:900;transform:translateX(-105%);transition:transform .2s ease;box-shadow:10px 0 30px #0008}
-  .sidebar.mobile-open{transform:translateX(0)}
-  .member{position:fixed;right:0;top:0;bottom:0;width:min(82vw,300px);z-index:890;transform:translateX(105%);transition:transform .2s ease;box-shadow:-10px 0 30px #0008}
-  .member.mobile-open{transform:translateX(0)}
-  .chat{min-width:0;width:100vw}.header{padding:8px 10px}.header-title{max-width:55vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.header-actions,.actions{gap:4px}.actions .small{padding:7px 8px}.mobile-only{display:inline-flex!important}
-  .inputbar{padding:7px;gap:5px}.inputbar textarea{min-width:0;font-size:15px}.file-btn{padding:8px!important}.inputbar .primary{padding:0 10px!important}
-  .messages{padding:10px 8px}.msg{padding:8px 7px}.modal{width:calc(100vw - 20px);max-height:88vh;overflow:auto}.server-custom-grid{grid-template-columns:1fr}.theme-menu{bottom:auto;top:42px;left:auto;right:0}.server-tools{flex-wrap:wrap}.server-tools .small{min-width:0}
-}
-@media (max-width:420px){.header-status{display:none}.actions .small{font-size:11px}.msgtext{font-size:14px}.auth-card{width:calc(100vw - 24px)}.theme-grid{grid-template-columns:repeat(2,1fr)!important}}
 </style>
 </head>
 <body>
@@ -127,22 +96,19 @@ hr{border:0;border-top:1px solid var(--border);margin:12px 0}
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <details class="theme-dropdown"><summary class="small" style="background:var(--hover);color:var(--text)">🎨 Themes ▾</summary><div class="theme-menu"><button class="small" onclick="quickTheme('dinky')">🌙 Dinky</button><button class="small" onclick="quickTheme('ocean')">🌊 Ocean</button><button class="small" onclick="quickTheme('forest')">🌲 Forest</button><button class="small" onclick="quickTheme('sunset')">🌅 Sunset</button><button class="small" onclick="quickTheme('lavender')">💜 Lavender</button><button class="small" onclick="quickTheme('mono')">⚪ Mono</button><button class="small primary" onclick="settings();this.closest('details').open=false">🎨 More themes & custom</button></div></details>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
   <main class="chat">
-    <header class="header"><div style="display:flex;align-items:center;gap:7px"><button class="small mobile-only" style="background:var(--hover);color:var(--text)" onclick="toggleMobileSidebar()">☰</button><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div style="display:flex;align-items:center;gap:5px"><div id="actions" class="actions"></div><button class="small mobile-only" style="background:var(--hover);color:var(--text)" onclick="toggleMobileMembers()">👥</button></div></header>
+    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
     <div id="messages" class="messages"></div>
     <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
-      <button class="small file-btn" title="Attach a file" style="background:var(--hover);color:var(--text)" onclick="pickFile()">📎</button>
-      <input id="fileInput" type="file" class="hidden" onchange="handleFilePick(event)">
       <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
       <div id="emoji" class="emoji hidden"></div>
       <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
       <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
-      <div id="fileInfo" class="file-info hidden"></div>
     </div>
   </main>
   <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
@@ -157,120 +123,18 @@ let friends=[],servers=[],requestsList=[],blocked=[],lastCount=-1,pollTimer=null
 let connected=false;
 let profileCache={};
 let globalMemberUsers=[];
-let selectedFile=null;
 let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe UI",avatar_color:"#89B4FA",banner_color:"#313244"};
 
 function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
 async function api(endpoint,data){
   try{
-    const r=await fetch(`${BASE_URL}/${endpoint}`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(data)
-    });
+    const r=await fetch(`${BASE_URL}/${endpoint}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
     const raw=await r.text();
     let out;
-    try{out=JSON.parse(raw)}
-    catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
-
-    if(r.status===401 && endpoint!=="login" && endpoint!=="register"){
-      handleAuthFailure();
-    }else if(r.ok){
-      setConnection(true);
-    }else{
-      setConnection(false,`HTTP ${r.status}`);
-    }
+    try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
+    if(r.ok){setConnection(true)}else{setConnection(false,`HTTP ${r.status}`)}
     return out;
-  }catch(e){
-    setConnection(false,"offline");
-    return {status:"error",message:"Connection error: "+e.message};
-  }
-}
-
-
-const THEME_PRESETS={
-  dinky:{name:"Dinky",colors:{bg:"#0f0f17",panel:"#11111b",surface:"#181825",input:"#1e1e2e",hover:"#313244",accent:"#cba6f7",text:"#cdd6f4",sub:"#a6adc8"}},
-  ocean:{name:"Ocean",colors:{bg:"#07141f",panel:"#0b1d2a",surface:"#102838",input:"#153447",hover:"#1f4b63",accent:"#67d5ff",text:"#d9f5ff",sub:"#9bc4d4"}},
-  forest:{name:"Forest",colors:{bg:"#0b160f",panel:"#0e2116",surface:"#13301d",input:"#173b24",hover:"#245734",accent:"#8be28b",text:"#e1f5e1",sub:"#a8c8a8"}},
-  sunset:{name:"Sunset",colors:{bg:"#1a0d14",panel:"#24111b",surface:"#321622",input:"#401b2a",hover:"#633047",accent:"#ff9b9b",text:"#ffe5e5",sub:"#d6a9b5"}},
-  lavender:{name:"Lavender",colors:{bg:"#12101c",panel:"#191526",surface:"#211c31",input:"#2b2440",hover:"#44375e",accent:"#d8b4ff",text:"#f0e8ff",sub:"#b9a9cf"}},
-  mono:{name:"Mono",colors:{bg:"#101010",panel:"#171717",surface:"#202020",input:"#292929",hover:"#3a3a3a",accent:"#ffffff",text:"#f4f4f4",sub:"#aaaaaa"}}
-};
-
-function hexToRgba(hex,alpha){
-  const h=hex.replace("#","");
-  const n=parseInt(h,16);
-  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${alpha})`;
-}
-function applyTheme(id,save=true){
-  const t=THEME_PRESETS[id];
-  if(!t)return;
-  const c=t.colors,r=document.documentElement.style;
-  r.setProperty("--bg",c.bg);r.setProperty("--panel",c.panel);r.setProperty("--surface",c.surface);
-  r.setProperty("--input",c.input);r.setProperty("--hover",c.hover);r.setProperty("--purple",c.accent);
-  r.setProperty("--blue",c.accent);r.setProperty("--text",c.text);r.setProperty("--sub",c.sub);
-  r.setProperty("--border",hexToRgba(c.text,.10));r.setProperty("--shadow","rgba(0,0,0,.53)");
-  r.setProperty("--msg","rgba(0,0,0,.20)");r.setProperty("--reply",c.input);
-  if(save)localStorage.setItem("dinky_theme",JSON.stringify({type:"preset",id}));
-  renderThemeGrid(id);
-}
-function applyCustomTheme(){
-  const ids=["themeBg","themePanel","themeSurface","themeInput","themeHover","themeAccent","themeText","themeSub"];
-  const vals=ids.map(id=>$(id)?.value);
-  if(vals.some(v=>!v))return;
-  const c={bg:vals[0],panel:vals[1],surface:vals[2],input:vals[3],hover:vals[4],accent:vals[5],text:vals[6],sub:vals[7]};
-  const r=document.documentElement.style;
-  r.setProperty("--bg",c.bg);r.setProperty("--panel",c.panel);r.setProperty("--surface",c.surface);
-  r.setProperty("--input",c.input);r.setProperty("--hover",c.hover);r.setProperty("--purple",c.accent);
-  r.setProperty("--blue",c.accent);r.setProperty("--text",c.text);r.setProperty("--sub",c.sub);
-  r.setProperty("--border",hexToRgba(c.text,.10));r.setProperty("--shadow","rgba(0,0,0,.53)");
-  r.setProperty("--msg","rgba(0,0,0,.20)");r.setProperty("--reply",c.input);
-  localStorage.setItem("dinky_theme",JSON.stringify({type:"custom",colors:c}));
-  renderThemeGrid(null);
-}
-function renderThemeGrid(activeId){
-  const box=$("themeGrid"); if(!box)return;
-  box.innerHTML="";
-  Object.entries(THEME_PRESETS).forEach(([id,t])=>{
-    const c=t.colors,b=document.createElement("button");
-    b.className="theme-card"+(activeId===id?" active":"");
-    b.innerHTML=`<div class="theme-swatch">
-      <span style="background:${c.bg}"></span><span style="background:${c.surface}"></span>
-      <span style="background:${c.input}"></span><span style="background:${c.accent}"></span>
-    </div><div class="theme-name">${esc(t.name)}${activeId===id?" ✓":""}</div>`;
-    b.onclick=()=>applyTheme(id);
-    box.appendChild(b);
-  });
-}
-function loadTheme(){
-  try{
-    const saved=JSON.parse(localStorage.getItem("dinky_theme")||"null");
-    if(saved?.type==="preset"&&THEME_PRESETS[saved.id]){applyTheme(saved.id,false);return}
-    if(saved?.type==="custom"&&saved.colors){
-      const c=saved.colors,r=document.documentElement.style;
-      for(const [k,v] of Object.entries(c)){
-        if(k==="accent"){r.setProperty("--purple",v);r.setProperty("--blue",v)}
-        else r.setProperty("--"+k,v);
-      }
-      r.setProperty("--border",hexToRgba(c.text,.10));r.setProperty("--shadow","rgba(0,0,0,.53)");
-      r.setProperty("--msg","rgba(0,0,0,.20)");r.setProperty("--reply",c.input);
-      return;
-    }
-  }catch{}
-}
-loadTheme();
-
-let authFailureShown=false;
-function handleAuthFailure(){
-  if(authFailureShown)return;
-  authFailureShown=true;
-  clearInterval(pollTimer);
-  localStorage.removeItem("dinky_session");
-  session=null;
-  $("app").classList.add("hidden");
-  $("auth-screen").classList.remove("hidden");
-  $("error").textContent="Your Dinky Chat session expired. Please log in again.";
-  setConnection(false,"HTTP 401");
+  }catch(e){setConnection(false,"offline");return {status:"error",message:"Connection error: "+e.message};}
 }
 function setConnection(ok,label){
   connected=ok;
@@ -281,10 +145,6 @@ function messageKeydown(e){
   if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
 }
 
-function quickTheme(id){applyTheme(id);document.querySelectorAll('.theme-dropdown').forEach(d=>d.open=false)}
-function toggleMobileSidebar(){document.querySelector('.sidebar')?.classList.toggle('mobile-open');document.querySelector('.member')?.classList.remove('mobile-open')}
-function toggleMobileMembers(){document.querySelector('.member')?.classList.toggle('mobile-open');document.querySelector('.sidebar')?.classList.remove('mobile-open')}
-function closeMobilePanels(){document.querySelector('.sidebar')?.classList.remove('mobile-open');document.querySelector('.member')?.classList.remove('mobile-open')}
 function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
 window.onload=()=>{
   setupEmoji();
@@ -296,11 +156,8 @@ async function login(){
   if(!username||!password)return error("Fill in all fields.");
   const r=await api("login",{username,password});
   if(r.status==="success"){
-    authFailureShown=false;
-    session=r;
-    localStorage.setItem("dinky_session",JSON.stringify(r));
-    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));
-    startApp();
+    session=r;localStorage.setItem("dinky_session",JSON.stringify(r));
+    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));startApp();
   }else error(r.message||"Login failed.");
 }
 async function register(){
@@ -311,38 +168,13 @@ async function register(){
   else error(r.message||"Registration failed.");
 }
 function error(x){$("error").textContent=x}
-async function startApp(){
+function startApp(){
   $("auth-screen").classList.add("hidden");$("app").classList.remove("hidden");
-  await loadOwnProfile();
-  await poll();pollTimer=setInterval(poll,1000);
+  poll();pollTimer=setInterval(poll,1000);
   setTimeout(()=>$("message").focus(),50);
 }
 function logout(){if(!confirm("Log out of Dinky Chat?"))return;localStorage.removeItem("dinky_session");clearInterval(pollTimer);location.reload()}
 function $(id){return document.getElementById(id)}
-
-async function loadOwnProfile(){
-  if(!session?.username||!session?.token)return;
-  const r=await api("get_user_profile",{
-    username:session.username,
-    token:session.token,
-    target:session.username
-  });
-  if(r.status==="success"&&r.profile){
-    const p=r.profile;
-    profile={
-      ...profile,
-      status_msg:p.status??p.status_msg??profile.status_msg,
-      bio:p.bio??profile.bio,
-      name_color:p.name_color||profile.name_color,
-      font_family:p.font_family||profile.font_family,
-      avatar_color:p.avatar_color||profile.avatar_color,
-      banner_color:p.banner_color||profile.banner_color,
-      avatar_url:p.avatar_url||profile.avatar_url,
-      banner_url:p.banner_url||profile.banner_url
-    };
-    document.documentElement.style.setProperty("--font", profile.font_family);
-  }
-}
 async function poll(){
   if(!session)return;
   const r=await api("get_social_data",{username:session.username,token:session.token});
@@ -360,10 +192,8 @@ async function poll(){
   if(msgs.length!==lastCount){
     const box=$("messages");
     const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
-    lastCount=msgs.length;
-    const previousScroll=box.scrollTop;
-    renderMessages(msgs);
-    if(!nearBottom)box.scrollTop=previousScroll;
+    lastCount=msgs.length;renderMessages(msgs);
+    if(!nearBottom)box.scrollTop=box.dataset.previousScroll||0;
   }
 }
 function renderSidebar(){
@@ -372,7 +202,7 @@ function renderSidebar(){
   servers.forEach(s=>{
     if(q&&!s.name.toLowerCase().includes(q))return;
     const box=document.createElement("div");
-    box.innerHTML=`<div class="server-head">${s.icon_url?`<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}" alt="">`:"🏠"} ${esc(s.name)}</div>`;
+    box.innerHTML=`<div class="server-head">🏠 ${esc(s.name)}</div>`;
     (s.channels||["general"]).forEach(c=>{
       const b=document.createElement("button");b.className="nav sub"+(currentChannel===`server_${s.id}_${c}`?" active":"");
       b.textContent=`# ${c}`;b.onclick=()=>switchChannel(`server_${s.id}_${c}`,s.id);box.appendChild(b);
@@ -386,7 +216,6 @@ function renderSidebar(){
   });
 }
 function switchChannel(ch,serverId=null){
-  closeMobilePanels();
   currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
   $("actions").innerHTML="";
   if(serverId){
@@ -449,7 +278,7 @@ function renderGlobalMembers(){
   $("member").querySelector(".section").textContent="PUBLIC MEMBERS";
   const box=$("members");
   box.innerHTML="";
-  const publicUsers=[...new Set([session.username,...globalMemberUsers])].filter(u=>u===session.username||profileCache[u]);
+  const publicUsers=globalMemberUsers.filter(u=>u===session.username||profileCache[u]);
 
   if(!publicUsers.length){
     box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No public profiles in global yet.</div>';
@@ -482,47 +311,11 @@ function renderMessages(msgs){
     const a=document.createElement("span");a.className="author";a.textContent=m.sender;a.style.color=m.name_color||"#CBA6F7";a.onclick=()=>viewProfile(m.sender);
     const head=document.createElement("div");head.appendChild(a);
     div.innerHTML=reply;div.appendChild(head);
-    if(text){const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body)}
-    if(m.file_url) div.appendChild(createFileElement(m));
+    const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body);
     div.oncontextmenu=e=>{e.preventDefault();messageMenu(e,m.sender,text,m.id??i,!!m.is_owner)};$("messages").appendChild(div);
   });
   if(oldScroll>=0 && box.scrollHeight-box.clientHeight-oldScroll<80)box.scrollTop=box.scrollHeight;
   else box.scrollTop=oldScroll;
-}
-function absoluteFileUrl(url){return String(url||"").startsWith("http")?url:`${BASE_URL}${url}`;}
-function createFileElement(m){
-  const wrap=document.createElement("div");wrap.className="file-card";
-  const url=absoluteFileUrl(m.file_url);
-  const name=m.file_name||String(m.file_url).split("/").pop()||"Attached file";
-  const type=(m.file_type||"").toLowerCase();
-  if(type.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp)$/i.test(name)){
-    const img=document.createElement("img");img.src=url;img.alt=name;img.className="file-image";img.loading="lazy";
-    img.onclick=()=>window.open(url,"_blank");wrap.appendChild(img);
-  }
-  const row=document.createElement("div");row.className="file-row";
-  const label=document.createElement("span");label.textContent=`📎 ${name}${m.file_size?` • ${formatBytes(m.file_size)}`:""}`;
-  const link=document.createElement("a");link.href=url;link.target="_blank";link.rel="noopener";link.download=name;link.className="small primary";link.textContent="Open";
-  row.append(label,link);wrap.appendChild(row);
-  return wrap;
-}
-function formatBytes(n){if(!n)return "";const u=["B","KB","MB","GB"];let i=0,x=Number(n);while(x>=1024&&i<u.length-1){x/=1024;i++}return `${x<10&&i>0?x.toFixed(1):Math.round(x)} ${u[i]}`}
-function pickFile(){if(currentChannel==="friends_tab")return;$("fileInput").click()}
-function handleFilePick(e){
-  selectedFile=e.target.files?.[0]||null;
-  const info=$("fileInfo");
-  if(!selectedFile){info.textContent="";info.classList.add("hidden");return}
-  info.textContent=`📎 ${selectedFile.name} • ${formatBytes(selectedFile.size)} (press Send)`;info.classList.remove("hidden");
-}
-function clearSelectedFile(){selectedFile=null;const input=$("fileInput");if(input)input.value="";const info=$("fileInfo");if(info){info.textContent="";info.classList.add("hidden")}}
-async function uploadChatFile(file){
-  const fd=new FormData();fd.append("username",session.username);fd.append("token",session.token);fd.append("file",file);
-  try{
-    const r=await fetch(`${BASE_URL}/upload_chat_file`,{method:"POST",body:fd});
-    const raw=await r.text();let out;try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
-    if(r.status===401){handleAuthFailure();return {status:"error",message:"Your session expired. Please log in again."}}
-    if(r.ok)setConnection(true);else setConnection(false,`HTTP ${r.status}`);
-    return out;
-  }catch(e){setConnection(false,"offline");return {status:"error",message:"Upload failed: "+e.message}}
 }
 function messageMenu(e,sender,text,id,owner){
   const items=[["Reply",()=>setReply(sender,text)]];
@@ -531,38 +324,19 @@ function messageMenu(e,sender,text,id,owner){
 }
 function showMenu(x,y,items){
   document.querySelectorAll(".popup").forEach(x=>x.remove());
-  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px var(--shadow)`;
+  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px #0008`;
   items.forEach(([t,fn])=>{const b=document.createElement("button");b.className="nav";b.textContent=t;b.onclick=()=>{d.remove();fn()};d.appendChild(b)});document.body.appendChild(d);
 }
 document.addEventListener("click",()=>document.querySelectorAll(".popup").forEach(x=>x.remove()));
 function setReply(sender,text){const clean=text.split("\n")[0].slice(0,45)+(text.length>45?"...":"");replyTarget={sender,text:clean};$("replytext").textContent=`Replying to @${sender}: "${clean}"`;$("replybar").classList.remove("hidden");$("message").focus()}
 function cancelReply(){replyTarget=null;$("replybar").classList.add("hidden")}
 async function send(){
-  let text=$("message").value.trim();if((!text&&!selectedFile)||currentChannel==="friends_tab")return;
-  const originalText=text, file=selectedFile;
-  if(replyTarget&&text)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
+  let text=$("message").value.trim();if(!text||currentChannel==="friends_tab")return;
+  $("message").value="";
+  if(replyTarget)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
   let ch=currentChannel;if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
-  const sendBtn=document.querySelector('.inputbar .primary:last-of-type');
-  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent=file?"Uploading…":"Sending…"}
-  try{
-    let fileData=null;
-    if(file){
-      const up=await uploadChatFile(file);
-      if(up.status!=="success"){alert(up.message||"File upload failed.");return}
-      fileData=up;
-    }
-    $("message").value="";cancelReply();clearSelectedFile();
-    const payload={username:session.username,token:session.token,channel:ch,text};
-    if(fileData){payload.file_url=fileData.file_url;payload.file_name=fileData.file_name;payload.file_size=fileData.file_size;payload.file_type=fileData.file_type}
-    const r=await api("send_message",payload);
-    if(r.status==="error"){
-      $("message").value=originalText;autoGrow($("message"));
-      alert(r.message||"Failed to send message.");return;
-    }
-    poll();
-  }finally{
-    if(sendBtn){sendBtn.disabled=false;sendBtn.textContent="Send"}
-  }
+  cancelReply();const r=await api("send_message",{username:session.username,token:session.token,channel:ch,text});
+  if(r.status==="error")alert(r.message||"Failed to send message.");poll();
 }
 async function deleteMessage(id){const r=await api("delete_message",{username:session.username,token:session.token,msg_id:id});if(r.status!=="success")alert(r.message||"Could not delete message.");poll()}
 function friendsTab(){switchChannel("friends_tab");$("messages").innerHTML="<h2 style='color:var(--purple)'>=== FRIENDS HUB ===</h2>"+friends.map(f=>`<button class="nav">• @${esc(f.username)} — Status: ${esc(f.status||"Offline")}</button>`).join("")}
@@ -572,11 +346,8 @@ function openModal(content){$("modal").innerHTML=content;$("overlay").classList.
 function closeModal(e){if(!e||e.target===$("overlay"))$("overlay").classList.add("hidden")}
 async function addFriend(){
   const target=prompt("Enter username to add:");if(!target)return;
-  const clean=target.trim();
-  if(clean===session.username)return alert("You cannot add yourself.");
-  const r=await api("send_friend_request",{username:session.username,token:session.token,target:clean});
-  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));
-  if(r.status==="success")poll();
+  const r=await api("send_friend_request",{username:session.username,token:session.token,target:target.trim()});
+  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));poll();
 }
 async function createServer(){
   const raw=prompt("Enter Server Name:");
@@ -609,17 +380,54 @@ async function deleteChannel(){
   if(r.status==="success"){alert("Channel deleted.");switchChannel("global")}else alert(r.message||"Could not delete channel.");
 }
 async function discover(){
-  const r=await api("get_public_servers",{username:session.username,token:session.token});
-  const p=await api("get_discover_profiles",{username:session.username,token:session.token});
-  const pub=r.status==="success"?(r.servers||[]):[]; const people=p.status==="success"?(p.profiles||[]):[];
-  if(r.status!=="success"&&p.status!=="success")return alert(r.message||p.message||"Discovery is unavailable right now.");
-  openModal(`<h2>🔍 Discover</h2>
-    <input id="discoverSearch" placeholder="Search servers or people..." oninput="filterDiscover()">
-    <div id="discoverServers"><h3>Servers</h3>${pub.map(s=>`<div class="card discover-item" data-search="${esc((s.name+' '+(s.description||'')+' '+(s.tags||[]).join(' ')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px;flex:1">${s.icon_url?`<img class="server-icon" src="${absoluteFileUrl(s.icon_url)}">`:"🌐"}<div><b>${esc(s.name)}</b><div style="font-size:11px;color:var(--sub)">${esc(s.description||'Public server')} • ${s.members_count} member${s.members_count===1?'':'s'}</div></div></div><button class="small" style="background:var(--green);color:#111" onclick="joinServer(${JSON.stringify(String(s.id))})">Join</button></div>`).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
-    <hr><div id="discoverPeople"><h3>People</h3>${people.map(x=>`<div class="card discover-item" data-search="${esc((x.username+' '+(x.status||'')+' '+(x.bio||'')).toLowerCase())}"><div style="display:flex;align-items:center;gap:8px"><div class="avatar small-avatar">${esc(x.username[0]||'?').toUpperCase()}</div><span>@${esc(x.username)} <small style="color:var(--sub)">${esc(x.status||"Offline")}</small></span></div><button class="small primary" onclick="sendDiscover(${JSON.stringify(x.username)})">+ Add Friend</button></div>`).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`);
+  openModal(`<h2>Discover — Servers & People</h2><div id="discoverLoading" style="color:var(--sub);padding:10px">Loading discovery...</div>`);
+  try{
+    const [r,p]=await Promise.all([
+      api("get_public_servers",{username:session.username,token:session.token}),
+      api("get_discover_profiles",{username:session.username,token:session.token})
+    ]);
+    if(r.status!=="success"){
+      $("modal").innerHTML=`<h2>Discover — Servers & People</h2><div style="color:var(--red);padding:10px">Could not load public servers.<br><small>${esc(r.message||JSON.stringify(r))}</small></div>`;
+      return;
+    }
+    const pub=Array.isArray(r.servers)?r.servers:[];
+    const people=p.status==="success"&&Array.isArray(p.profiles)?p.profiles:[];
+    $("modal").innerHTML=`<h2>Discover — Servers & People</h2>
+      <input id="discoverSearch" placeholder="Search servers and people..." oninput="filterDiscover()">
+      <h3>Servers <span id="serverCount" style="color:var(--sub);font-size:11px">(${pub.length})</span></h3>
+      <div id="discoverServers">${pub.map(s=>{
+        const sid=JSON.stringify(String(s.id));
+        const search=esc(String(s.name||"")+" "+String(s.description||"")+" "+(Array.isArray(s.tags)?s.tags.join(" "):""));
+        return `<div class="card discover-item" data-kind="server" data-search="${search.toLowerCase()}"><div><b>${esc(s.name||"Unnamed server")}</b><div style="color:var(--sub);font-size:11px">${esc(s.description||"")} ${s.members_count!=null?`• ${s.members_count} member${s.members_count==1?"":"s"}`:""}</div></div><button class="small" style="background:var(--green);color:#111" onclick='joinServer(${sid})'>Join</button></div>`;
+      }).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
+      <hr><h3>People <span style="color:var(--sub);font-size:11px">(${people.length})</span></h3>
+      <div id="discoverPeople">${people.map(x=>{
+        const u=JSON.stringify(String(x.username||""));
+        const search=esc(String(x.username||"")+" "+String(x.status||"")+" "+String(x.bio||""));
+        return `<div class="card discover-item" data-kind="person" data-search="${search.toLowerCase()}"><span>@${esc(x.username||"")} (${esc(x.status||"Offline")})</span><button class="small primary" onclick='sendDiscover(${u})'>+ Add Friend</button></div>`;
+      }).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`;
+  }catch(e){
+    $("modal").innerHTML=`<h2>Discover — Servers & People</h2><div style="color:var(--red);padding:10px">Discovery failed.<br><small>${esc(String(e))}</small></div>`;
+  }
 }
-function filterDiscover(){const q=($('discoverSearch')?.value||'').toLowerCase().trim();document.querySelectorAll('.discover-item').forEach(x=>x.style.display=!q||x.dataset.search.includes(q)?'flex':'none')}
-async function joinServer(id){const r=await api("join_public_server",{username:session.username,token:session.token,server_id:String(id)});alert(r.message||(r.status==="success"?"Joined server successfully!":"Could not join."));if(r.status==="success"){closeModal();poll()}}
+function filterDiscover(){
+  const q=($( "discoverSearch")?.value||"").toLowerCase().trim();
+  document.querySelectorAll(".discover-item").forEach(el=>{
+    el.style.display=!q||el.dataset.search.includes(q)?"flex":"none";
+  });
+}
+async function joinServer(id){
+  id=String(id||"").trim();
+  if(!id)return alert("Invalid server ID.");
+  const r=await api("join_public_server",{username:session.username,token:session.token,server_id:id});
+  if(r.status==="success"){
+    alert(r.message||"Joined server successfully!");
+    closeModal();
+    await poll();
+  }else{
+    alert(`Could not join server.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
+  }
+}
 async function sendDiscover(u){
   u=String(u||"").trim();
   if(!u||u===session.username)return alert("Please choose another user.");
@@ -632,36 +440,15 @@ async function requests(){
 }
 async function respond(u,action){await api("respond_friend_request",{username:session.username,token:session.token,sender:u,action});closeModal();poll()}
 async function serverSettings(){
-  const s=servers.find(x=>String(x.id)===String(currentServerId));if(!s)return;
+  const s=servers.find(x=>x.id===currentServerId);if(!s)return;
   if(s.owner!==session.username)return alert("Only the server owner can modify these settings.");
-  const roles=s.roles||[]; const ob=s.onboarding||{};
-  openModal(`<h2>⚙ Server Customization</h2>
-    <div class="server-banner" style="background-image:${s.banner_url?`url(${absoluteFileUrl(s.banner_url)})`:"linear-gradient(135deg,var(--purple),var(--surface))"}"></div>
-    <div class="server-custom-grid">
-      <div class="full"><label>Server Name</label><input id="svName" value="${esc(s.name)}"></div>
-      <div class="full"><label>Description</label><textarea id="svDesc" maxlength="1000">${esc(s.description||"")}</textarea></div>
-      <div><label>Primary Color</label><input id="svPrimary" type="color" value="${s.primary_color||'#181825'}"></div>
-      <div><label>Accent Color</label><input id="svAccent" type="color" value="${s.accent_color||'#CBA6F7'}"></div>
-      <div class="full"><label>Tags (comma separated)</label><input id="svTags" value="${esc((s.tags||[]).join(', '))}" placeholder="gaming, art, friends"></div>
-      <div class="full"><label>Games / interests (comma separated)</label><input id="svGames" value="${esc((s.games||[]).join(', '))}" placeholder="Minecraft, Roblox..."></div>
-      <div class="full"><label>Welcome message</label><input id="svWelcome" value="${esc(s.welcome_message||"")}" placeholder="Welcome to the server!"></div>
-    </div>
-    <div class="row" style="margin-top:8px"><button class="small" onclick="uploadServerAsset('icon')">🖼 Change Icon</button><button class="small" onclick="uploadServerAsset('banner')">🌄 Change Banner</button><button class="small primary" onclick="saveServerProfile()">Save Profile</button></div>
-    <hr><h3>🎭 Roles</h3><div id="roleList">${roles.map(r=>`<div class="card"><span><b style="color:${esc(r.color||'var(--text)')}">${esc(r.name)}</b><small style="color:var(--sub)"> • ${(r.members||[]).length} member${(r.members||[]).length===1?'':'s'}</small></span>${r.id==='everyone'?'':`<button class="small" style="background:var(--red);color:#111" onclick="deleteRole(${JSON.stringify(String(r.id))})">Delete</button>`}</div>`).join('')}</div><button class="small primary" onclick="createRole()">+ Create Role</button>
-    <hr><h3>👋 Onboarding / Server Guide</h3><label class="checkbox"><input id="obEnabled" type="checkbox" ${ob.enabled?'checked':''}> Enable welcome/onboarding</label><textarea id="obWelcome" placeholder="Tell new members what this place is about...">${esc(ob.welcome||'')}</textarea><button class="small primary" onclick="saveOnboarding()">Save Onboarding</button>
-    <hr><button class="btn secondary" onclick="togglePublic()">${s.is_public?'🌐 Make Private':'🌐 Make Public / Discoverable'}</button><button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation</button><button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
+  openModal(`<h2>Server Management</h2>
+    <button class="btn secondary" onclick="togglePublic()">Toggle Public / Private Visibility</button>
+    <button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation (Everyone vs Owner)</button>
+    <button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
 }
-async function saveServerProfile(){
-  const tags=$('svTags').value.split(',').map(x=>x.trim()).filter(Boolean);const games=$('svGames').value.split(',').map(x=>x.trim()).filter(Boolean);
-  const r=await api('update_server_profile',{username:session.username,token:session.token,server_id:String(currentServerId),name:$('svName').value,description:$('svDesc').value,tags,games,primary_color:$('svPrimary').value,accent_color:$('svAccent').value,welcome_message:$('svWelcome').value});
-  if(r.status==='success'){alert('Server customization saved!');await poll();serverSettings()}else alert(r.message||'Could not save server profile.');
-}
-async function uploadServerAsset(type){
-  const input=document.createElement('input');input.type='file';input.accept='image/png,image/jpeg,image/gif,image/webp';input.onchange=async()=>{if(!input.files[0])return;const fd=new FormData();fd.append('username',session.username);fd.append('token',session.token);fd.append('server_id',String(currentServerId));fd.append('asset_type',type);fd.append('file',input.files[0]);const r=await fetch(`${BASE_URL}/upload_server_asset`,{method:'POST',body:fd});const out=await r.json().catch(()=>({status:'error',message:'Upload failed'}));if(out.status==='success'){await poll();serverSettings()}else alert(out.message||'Upload failed.')};input.click();
-}
-async function createRole(){const name=prompt('Role name:');if(!name)return;const r=await api('create_role',{username:session.username,token:session.token,server_id:String(currentServerId),name,color:'#CBA6F7',permissions:['view','send']});if(r.status==='success')serverSettings();else alert(r.message||'Could not create role.')}
-async function deleteRole(id){if(!confirm('Delete this role?'))return;const r=await api('delete_role',{username:session.username,token:session.token,server_id:String(currentServerId),role_id:String(id)});if(r.status==='success')serverSettings();else alert(r.message||'Could not delete role.')}
-async function saveOnboarding(){const r=await api('update_onboarding',{username:session.username,token:session.token,server_id:String(currentServerId),enabled:$('obEnabled').checked,welcome:$('obWelcome').value,questions:[]});if(r.status==='success'){alert('Onboarding saved!');poll()}else alert(r.message||'Could not save onboarding.')}
+async function togglePublic(){const r=await api("toggle_server_public",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||"Updated!");poll()}
+async function toggleCreation(){const r=await api("toggle_channel_creation_perm",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||`Channel creation set to: ${r.channel_creation_perm||"everyone"}`);poll()}
 async function deleteServer(){
   openModal(`<h2 style="color:var(--red)">Delete Server</h2><p style="margin-bottom:10px">Enter password twice to delete.</p><input id="del1" type="password" placeholder="Password"><input id="del2" type="password" placeholder="Confirm Password"><button class="btn" style="background:var(--red);color:#111" onclick="confirmDeleteServer()">Delete Server Permanently</button>`);
 }
@@ -676,42 +463,13 @@ async function settings(){
     <label>Avatar Color</label><input id="avatarColor" type="color" value="${profile.avatar_color}">
     <label>Banner Color</label><input id="bannerColor" type="color" value="${profile.banner_color}">
     <label>Font Family</label><input id="font" value="${esc(profile.font_family)}">
-    <hr><h3>🎨 Themes — free</h3>
-    <div class="theme-note">Pick a preset or make your own. Themes are saved on this device and don't require a paid plan.</div>
-    <div id="themeGrid" class="theme-grid"></div>
-    <div class="custom-theme-box">
-      <b style="font-size:12px;color:var(--purple)">Custom Theme</b>
-      <div class="color-row" style="margin-top:8px">
-        <div class="color-field"><label>Background</label><input id="themeBg" type="color"></div>
-        <div class="color-field"><label>Panel</label><input id="themePanel" type="color"></div>
-        <div class="color-field"><label>Surface</label><input id="themeSurface" type="color"></div>
-        <div class="color-field"><label>Input</label><input id="themeInput" type="color"></div>
-        <div class="color-field"><label>Hover</label><input id="themeHover" type="color"></div>
-        <div class="color-field"><label>Accent</label><input id="themeAccent" type="color"></div>
-        <div class="color-field"><label>Text</label><input id="themeText" type="color"></div>
-        <div class="color-field"><label>Secondary text</label><input id="themeSub" type="color"></div>
-      </div>
-      <button class="btn primary" style="margin-top:8px" onclick="applyCustomTheme()">Apply Custom Theme</button>
-    </div>
-    <hr><h3>🪪 Profile</h3><div class="row"><button class="small" onclick="uploadProfileAsset('avatar')">🖼 Upload Avatar</button><button class="small" onclick="uploadProfileAsset('banner')">🌄 Upload Banner</button></div><div class="theme-note">PNG, JPG, GIF or WEBP. Your avatar and banner are shown on your profile card.</div>
     <label>Status Preset</label><input id="status" value="${esc(profile.status_msg)}">
     <label>Bio</label><textarea id="bio">${esc(profile.bio)}</textarea>
     <button class="btn secondary" onclick="toggleProfile()">Toggle Public Profile (Discoverability)</button>
     <button class="btn secondary" onclick="copyUsername()">📋 Copy My Username</button>
     <label class="checkbox"><input id="autoSet" type="checkbox" ${st.auto_login?"checked":""}> Auto Login on Startup</label>
     <button class="btn primary" onclick="saveSettings()">Save Profile & Settings</button>`);
-  setTimeout(()=>{
-    const saved=JSON.parse(localStorage.getItem("dinky_theme")||"null");
-    const c=saved?.type==="custom"?saved.colors:THEME_PRESETS[saved?.id||"dinky"]?.colors;
-    if(c){
-      $("themeBg").value=c.bg;$("themePanel").value=c.panel;$("themeSurface").value=c.surface;
-      $("themeInput").value=c.input;$("themeHover").value=c.hover;$("themeAccent").value=c.accent;
-      $("themeText").value=c.text;$("themeSub").value=c.sub;
-    }
-    renderThemeGrid(saved?.type==="preset"?saved.id:null);
-  },0);
 }
-async function uploadProfileAsset(type){const input=document.createElement('input');input.type='file';input.accept='image/png,image/jpeg,image/gif,image/webp';input.onchange=async()=>{if(!input.files[0])return;const fd=new FormData();fd.append('username',session.username);fd.append('token',session.token);fd.append('file',input.files[0]);const endpoint=type==='avatar'?'upload_avatar':'upload_banner';const r=await fetch(`${BASE_URL}/${endpoint}`,{method:'POST',body:fd});const out=await r.json().catch(()=>({status:'error',message:'Upload failed'}));if(out.status==='success'){await loadOwnProfile();closeModal();viewProfile(session.username)}else alert(out.message||'Upload failed.')};input.click()}
 async function toggleProfile(){const r=await api("toggle_profile_public",{username:session.username,token:session.token});alert(r.message||"Updated profile visibility.")}
 async function copyUsername(){
   try{await navigator.clipboard.writeText(session.username);alert(`Copied @${session.username}`)}
@@ -719,7 +477,7 @@ async function copyUsername(){
 }
 async function saveSettings(){
   profile.name_color=$("nameColor").value;profile.avatar_color=$("avatarColor").value;profile.banner_color=$("bannerColor").value;
-  profile.font_family=$("font").value.trim()||"Segoe UI";profile.status_msg=$("status").value.trim()||"Online";profile.bio=$("bio").value.trim();document.documentElement.style.setProperty("--font",profile.font_family);
+  profile.font_family=$("font").value.trim()||"Segoe UI";profile.status_msg=$("status").value.trim()||"Online";profile.bio=$("bio").value.trim();
   localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("autoSet").checked}));
   await api("update_profile",{username:session.username,token:session.token,status:profile.status_msg,bio:profile.bio,name_color:profile.name_color,avatar_color:profile.avatar_color,banner_color:profile.banner_color,font_family:profile.font_family});
   closeModal();poll();
@@ -727,8 +485,12 @@ async function saveSettings(){
 async function viewProfile(target){
   const r=await api("get_user_profile",{username:session.username,token:session.token,target});
   if(r.status!=="success")return alert("Could not fetch profile.");
-  const p=r.profile||{};const avatar=p.avatar_url?`<img class="profile-avatar" src="${absoluteFileUrl(p.avatar_url)}">`:`<div class="profile-avatar" style="display:flex;align-items:center;justify-content:center;background:${esc(p.avatar_color||'#89B4FA')};color:#111;font-size:28px;font-weight:900">${esc((p.username||'?')[0]).toUpperCase()}</div>`;
-  openModal(`<div class="profile-banner" style="background:${p.banner_url?`url(${absoluteFileUrl(p.banner_url)}) center/cover`:esc(p.banner_color||"#313244")}"></div><div style="padding:0 12px 12px">${avatar}<h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2><div class="status">${esc(p.status||"Offline")}</div><div class="bio">${esc(p.bio||"No bio provided.")}</div>${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:`<button class="small primary" onclick="settings();">Edit Profile</button>`}</div>`);
+  const p=r.profile||{};
+  openModal(`<div class="profile-banner" style="background:${esc(p.banner_color||"#313244")}"></div>
+    <h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2>
+    <div class="status">Status: ${esc(p.status||"Offline")}</div>
+    <div class="bio">${esc(p.bio||"No bio provided.")}</div>
+    ${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:""}`);
 }
 async function unfriend(u){await api("unfriend_user",{username:session.username,token:session.token,target:u});alert(`Removed @${u} from friends.`);closeModal();poll()}
 async function block(u){await api("block_user",{username:session.username,token:session.token,target:u});alert(`Blocked @${u}.`);closeModal();poll()}
