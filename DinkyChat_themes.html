@@ -96,7 +96,7 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
@@ -145,9 +145,26 @@ function messageKeydown(e){
   if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
 }
 
+
+const THEMES={
+ midnight:{name:"Midnight",vars:{"--bg":"#0f0f17","--panel":"#11111b","--surface":"#181825","--input":"#1e1e2e","--hover":"#313244","--purple":"#cba6f7","--blue":"#89b4fa","--green":"#a6e3a1","--red":"#f38ba8","--text":"#cdd6f4","--sub":"#a6adc8"}},
+ ocean:{name:"Ocean",vars:{"--bg":"#071923","--panel":"#0b2530","--surface":"#103544","--input":"#154554","--hover":"#1d5b6e","--purple":"#7dd3fc","--blue":"#38bdf8","--green":"#86efac","--red":"#fda4af","--text":"#e0f2fe","--sub":"#9cc7d8"}},
+ sunset:{name:"Sunset",vars:{"--bg":"#21131b","--panel":"#2b1720","--surface":"#3a1f29","--input":"#492632","--hover":"#623343","--purple":"#f9a8d4","--blue":"#fdba74","--green":"#bef264","--red":"#fb7185","--text":"#ffe4e6","--sub":"#d8a9b4"}},
+ forest:{name:"Forest",vars:{"--bg":"#0c1712","--panel":"#102019","--surface":"#183026","--input":"#1e3b2e","--hover":"#2b5140","--purple":"#86efac","--blue":"#67e8f9","--green":"#bef264","--red":"#fca5a5","--text":"#dcfce7","--sub":"#9cc9ad"}},
+ neon:{name:"Neon",vars:{"--bg":"#090512","--panel":"#11091b","--surface":"#1a0d28","--input":"#241139","--hover":"#3b1b57","--purple":"#f0abfc","--blue":"#67e8f9","--green":"#5eead4","--red":"#fb7185","--text":"#fae8ff","--sub":"#c4a5d4"}}
+};
+function applyTheme(id){const t=THEMES[id]||THEMES.midnight;for(const [k,v] of Object.entries(t.vars))document.documentElement.style.setProperty(k,v);localStorage.setItem("dinky_theme",id);}
+function savedThemes(){try{return JSON.parse(localStorage.getItem("dinky_owned_themes")||'["midnight"]')}catch{return ["midnight"]}}
+function themeModal(){const owned=savedThemes();openModal(`<h2>🎨 Themes</h2><p style="color:var(--sub);margin-bottom:12px">Your unlocked themes.</p>${Object.entries(THEMES).map(([id,t])=>`<div class="card"><span>${esc(t.name)}</span><button class="small primary" onclick="applyTheme('${id}');themeModal()">${owned.includes(id)?"Use":"Locked"}</button></div>`).join("")}<button class="small" style="margin-top:8px;background:var(--hover);color:var(--text)" onclick="closeModal()">Close</button>`);}
+async function shop(){const r=await api("get_shop_data",{username:session.username,token:session.token});if(r.status!=="success")return error(r.message||"Shop failed.");openModal(`<h2>🛍️ Dinky Shop</h2><div style="font-weight:700;margin-bottom:12px">🪙 ${r.coins} coins</div><button class="small primary" onclick="claimCoins();shop()">Claim daily +50</button><button class="small" style="margin-left:5px;background:var(--hover);color:var(--text)" onclick="hostShop()">Host a Shop</button><hr><p style="color:var(--sub);font-size:12px">No gambling here — coins are for fixed-price fun cosmetics.</p>${(r.shops||[]).map(sh=>`<h3 style="margin-top:12px">${esc(sh.name)} <small style="color:var(--sub)">by @${esc(sh.owner)}</small></h3><p style="color:var(--sub);font-size:12px">${esc(sh.description||"")}</p>${(sh.items||[]).map(it=>`<div class="card"><span>${esc(it.name)}<br><small style="color:var(--sub)">${esc(THEMES[it.theme_id]?.name||it.theme_id)} · 🪙 ${it.price}</small></span><button class="small primary" onclick="buyItem('${esc(sh.owner)}','${esc(it.id)}')">Buy</button></div>`).join("")}`).join("")}`);}
+async function claimCoins(){const r=await api("claim_coins",{username:session.username,token:session.token});alert(r.message||"Done");}
+async function buyItem(owner,item){const r=await api("buy_shop_item",{username:session.username,token:session.token,owner,item_id:item});if(r.status!=="success")return alert(r.message||"Purchase failed.");const owned=savedThemes();if(r.theme_id&&!owned.includes(r.theme_id)){owned.push(r.theme_id);localStorage.setItem("dinky_owned_themes",JSON.stringify(owned));}alert(r.already_owned?"You already own that theme!":"Purchased!");shop();}
+async function hostShop(){openModal(`<h2>🏪 Host a Shop</h2><input id="shopName" placeholder="Shop name"><textarea id="shopDesc" placeholder="Description"></textarea><button class="small primary" onclick="createMyShop()">Create / Save Shop</button><hr><h3>Add Theme Item</h3><input id="itemName" placeholder="Item name"><select id="itemTheme" style="width:100%;padding:9px;margin:4px 0 10px;background:var(--input);color:var(--text);border:0;border-radius:5px">${Object.entries(THEMES).map(([id,t])=>`<option value="${id}">${t.name}</option>`).join("")}</select><input id="itemPrice" type="number" min="1" placeholder="Price"><button class="small primary" onclick="addMyItem()">Add Item</button>`);}
+async function createMyShop(){const r=await api("create_shop",{username:session.username,token:session.token,name:$('shopName').value,description:$('shopDesc').value});if(r.status!=="success")return alert(r.message||"Could not create shop.");alert("Shop saved!");hostShop();}
+async function addMyItem(){const r=await api("add_shop_item",{username:session.username,token:session.token,item_name:$('itemName').value,theme_id:$('itemTheme').value,price:$('itemPrice').value});alert(r.message||(r.status==="success"?"Item added!":"Could not add item."));}
 function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
 window.onload=()=>{
-  setupEmoji();
+  setupEmoji();applyTheme(localStorage.getItem("dinky_theme")||"midnight");
   const s=localStorage.getItem("dinky_session"), st=settingsData();
   if(s&&st.auto_login){try{session=JSON.parse(s);startApp()}catch{}}
 };
