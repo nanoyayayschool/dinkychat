@@ -17,6 +17,14 @@ body{margin:0;background:
  radial-gradient(circle at 15% 10%,#cba6f712,transparent 28%),
  radial-gradient(circle at 85% 20%,#89dceb0d,transparent 28%),
  var(--bg);color:var(--text);font-family:Inter,Segoe UI,system-ui,sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.35;
+ background-image:radial-gradient(circle,#ffffff22 1px,transparent 1px);background-size:38px 38px;
+ animation:drift 18s linear infinite}
+@keyframes drift{to{background-position:38px 38px}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(1.2deg)}50%{transform:translateY(-12px) rotate(-1deg)}}
+@keyframes pulseGlow{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.8;transform:scale(1.08)}}
+@keyframes rainbow{to{filter:hue-rotate(360deg)}}
+
 a{color:inherit;text-decoration:none}
 button{font:inherit}
 .nav{position:fixed;z-index:20;top:16px;left:50%;transform:translateX(-50%);
@@ -92,7 +100,7 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
 <body>
 <nav class="nav">
  <a class="brand" href="#top"><span class="logo">✦</span><span>dinky chat</span></a>
- <div class="navlinks"><a href="#features">features</a><a href="#custom">customize</a><a href="#chat-app">try it</a></div>
+ <div class="navlinks"><a href="#features">features</a><a href="#custom">customize</a><a href="#themes">themes</a><a href="#chat-app">try it</a></div>
  <button class="navcta" onclick="openChat()">Open Chat ↗</button>
 </nav>
 
@@ -139,6 +147,9 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
    <article class="card"><div class="icon">📎</div><h3>Send files</h3><p>Share images and files right inside conversations with previews and tidy download cards.</p></article>
    <article class="card"><div class="icon">🔎</div><h3>Discovery</h3><p>Find public communities and public profiles, then connect with people without leaving Dinky Chat.</p></article>
    <article class="card"><div class="icon">📱</div><h3>Actually mobile</h3><p>The interface adapts to smaller screens with mobile navigation, drawers and touch-friendly controls.</p></article>
+    <article class="card"><div class="icon">🛍️</div><h3>Cosmetic shop</h3><p>Collect and trade fixed-price cosmetic themes, profile borders and backgrounds with a simple in-app economy.</p></article>
+    <article class="card"><div class="icon">🎁</div><h3>Daily rewards</h3><p>Come back for free deterministic cosmetic rewards and keep building your collection.</p></article>
+    <article class="card"><div class="icon">👥</div><h3>Friends & communities</h3><p>Connect with friends, join communities and explore public servers from one place.</p></article>
   </div>
  </div>
 </section>
@@ -155,9 +166,24 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
  </div>
 </section>
 
+<section class="section" id="themes">
+ <div class="section-inner">
+  <div class="kicker">your vibe</div>
+  <h2>pick a whole new atmosphere.</h2>
+  <p class="lead">Dinky Chat is built around customization — from calm dark themes to full-on rainbow chaos.</p>
+  <div class="theme-strip">
+   <div class="theme-chip t-midnight">🌙 Midnight</div>
+   <div class="theme-chip t-ocean">🌊 Ocean</div>
+   <div class="theme-chip t-sunset">🌅 Sunset</div>
+   <div class="theme-chip t-forest">🌲 Forest</div>
+   <div class="theme-chip t-rainbow">🌈 Rainbow</div>
+  </div>
+ </div>
+</section>
+
 <section id="chat-app">
  <div class="chat-head"><div><div class="kicker">try it now</div><h2 style="margin:5px 0;font-size:38px">jump into dinky.</h2></div><button class="secondary" onclick="openChat()">Open in new tab ↗</button></div>
- <div class="chat-frame"><iframe src="DinkyChat_themes.html" title="Dinky Chat"></iframe></div>
+ <div class="chat-frame"><iframe src="DinkyChat_servers_fixed.html" title="Dinky Chat"></iframe></div>
 </section>
 
 <section class="cta">
@@ -168,7 +194,13 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
 
 <script>
 function openChat(){
-  window.open("DinkyChat_themes.html","_blank","noopener");
+  window.open("DinkyChat_servers_fixed.html","_blank","noopener");
+}
+function downloadPage(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="DinkyChat-Introduction.html";
+  a.click();URL.revokeObjectURL(a.href);
 }
 </script>
 </body>
