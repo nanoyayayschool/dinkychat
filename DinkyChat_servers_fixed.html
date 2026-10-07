@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dinky Chat — Web Edition</title>
+<style>
+:root{
+  --bg:#0f0f17;--panel:#11111b;--surface:#181825;--input:#1e1e2e;
+  --hover:#313244;--purple:#cba6f7;--blue:#89b4fa;--green:#a6e3a1;
+  --red:#f38ba8;--orange:#fab387;--text:#cdd6f4;--sub:#a6adc8;
+  --font:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font)}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
+button,input{font:inherit}
+.hidden{display:none!important}
+button{cursor:pointer}
+#auth-screen{height:100vh;display:flex;align-items:center;justify-content:center}
+.auth-card{width:360px;background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 24px #0008}
+.auth-card h1{text-align:center;color:var(--purple);font-size:24px}
+.auth-card p{text-align:center;color:var(--sub);font-size:13px;margin:4px 0 20px}
+.form-group{margin-bottom:12px}.form-group label{display:block;font-size:12px;font-weight:700;color:#bac2de;margin-bottom:4px}
+.form-group input{width:100%;padding:10px;background:var(--input);border:1px solid transparent;border-radius:6px;color:var(--text);outline:0}
+.form-group input:focus{border-color:var(--purple)}
+.checkbox{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:15px}
+.btn{width:100%;padding:10px;border:0;border-radius:6px;font-weight:700;margin-bottom:8px}
+.primary{background:var(--purple);color:#11111b}.secondary{background:var(--panel);color:var(--text)}
+#error{height:16px;color:var(--red);font-size:12px;margin-bottom:10px}
+#app{display:flex;width:100vw;height:100vh}
+.sidebar{width:250px;min-width:250px;background:var(--panel);display:flex;flex-direction:column;border-right:1px solid #fff0a}
+.search{padding:10px}.search input{width:100%;padding:7px 10px;background:var(--input);border:0;border-radius:4px;color:var(--text);outline:0}
+.scroll{flex:1;overflow:auto;padding:0 8px}.section{font-size:11px;font-weight:700;color:var(--purple);padding:8px 4px 4px;text-transform:uppercase}
+.nav{width:100%;border:0;border-radius:4px;background:transparent;color:var(--text);text-align:left;padding:8px 10px;font-size:13px;margin-bottom:2px}
+.nav:hover,.nav.active{background:var(--hover)}.nav.sub{padding-left:24px;font-size:12px;color:var(--sub)}
+.server-head{font-weight:700;font-size:12px;color:var(--purple);padding:4px 6px}
+.server-tools{display:flex;gap:4px;margin-bottom:6px}.small{padding:6px;border:0;border-radius:4px;font-size:11px;font-weight:700}
+.sidebar-actions{padding:8px;border-top:1px solid #fff1;display:flex;flex-direction:column;gap:4px}
+.chat{flex:1;min-width:0;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg),var(--surface))}
+.header{padding:12px 16px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff1}
+.header-title{font-weight:700;color:var(--purple);font-size:16px}.header-status{font-size:11px;color:var(--sub);margin-left:10px}.actions{display:flex;gap:6px}
+.messages{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{background:#0002;padding:7px 10px;border-radius:6px}.msg.ping{background:#3e2d54;border:1px solid var(--purple)}
+.author{font-weight:700;font-size:14px;cursor:pointer}.msgtext{font-size:14px;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}
+.reply-preview{font-size:11px;color:var(--sub);border-left:2px solid #5865f2;padding-left:6px;margin-bottom:4px;font-style:italic}
+.replybar{background:#2b2d31;padding:6px 12px;font-size:12px;color:#b9bbbe;display:flex;justify-content:space-between}
+.inputbar{padding:12px 16px;background:var(--surface);display:flex;gap:8px;position:relative}
+.inputbar textarea{flex:1;padding:10px;background:var(--input);border:0;border-radius:6px;color:var(--text);outline:0;resize:none;min-height:40px;max-height:120px;line-height:20px}
+.member{width:180px;min-width:180px;background:var(--panel);border-left:1px solid #fff1;padding:12px;overflow:auto}
+.member .section{padding-left:0}
+.emoji{position:absolute;bottom:60px;left:16px;background:var(--surface);border:1px solid var(--hover);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;box-shadow:0 4px 12px #0008}
+.modal-overlay{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{width:420px;max-width:92vw;max-height:85vh;overflow:auto;background:var(--panel);padding:20px;border-radius:8px}
+.modal h2,.modal h3{color:var(--purple);margin-bottom:12px}
+.modal input,.modal textarea{width:100%;background:var(--input);border:0;color:var(--text);padding:9px;border-radius:5px;outline:0;margin:4px 0 10px}
+.modal textarea{resize:vertical;min-height:70px}
+.row{display:flex;gap:6px}.row>*{flex:1}
+.card{background:var(--input);padding:9px;border-radius:5px;margin:5px 0;display:flex;align-items:center;justify-content:space-between}
+.chat-avatar{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;margin-right:7px;vertical-align:middle;overflow:hidden;font-size:14px;cursor:pointer}.msg-head{display:flex;align-items:center}.profile-banner{height:55px;border-radius:5px;margin-bottom:10px}
+.status{color:var(--green);font-size:12px;margin-bottom:10px}
+.bio{background:var(--input);padding:9px;border-radius:5px;margin-bottom:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+hr{border:0;border-top:1px solid #fff1;margin:12px 0}
+@media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
+</style>
+</head>
+<body>
+<div id="auth-screen">
+  <div class="auth-card">
+    <h1>DINKY CHAT</h1><p>Sign in to start chatting</p>
+    <div id="error"></div>
+    <div class="form-group"><label>Username</label><input id="user"></div>
+    <div class="form-group"><label>Password</label><input id="pass" type="password"></div>
+    <label class="checkbox"><input id="auto" type="checkbox" checked> Auto Login on Startup</label>
+    <button class="btn primary" onclick="login()">Log In</button>
+    <button class="btn secondary" onclick="register()">Create Account</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <aside class="sidebar">
+    <div class="search"><input id="search" placeholder="Search..." oninput="renderSidebar()"></div>
+    <div class="scroll">
+      <div class="section">⚡ Channels</div>
+      <button class="nav" onclick="switchChannel('global')"># global-chat</button>
+      <button class="nav" style="color:var(--green)" onclick="friendsTab()">👥 Friends Tab</button>
+      <div class="section">🏠 Servers</div>
+      <div class="server-tools">
+        <button class="small primary" style="flex:1" onclick="createServer()">+ Create</button>
+        <button class="small" style="flex:1;background:var(--blue);color:#111" onclick="discover()">🔍 Discover</button>
+      </div>
+      <div id="servers"></div>
+      <div class="section" style="display:flex;justify-content:space-between;align-items:center">
+        <span>💬 Direct Messages</span><button id="reqs" class="small" style="background:var(--hover);color:var(--green)" onclick="requests()">Requests (0)</button>
+      </div>
+      <div id="friends"></div>
+    </div>
+    <div class="sidebar-actions">
+      <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
+      <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
+    </div>
+  </aside>
+  <main class="chat">
+    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
+    <div id="messages" class="messages"></div>
+    <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
+    <div class="inputbar">
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
+      <div id="emoji" class="emoji hidden"></div>
+      <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
+      <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
+    </div>
+  </main>
+  <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
+</div>
+<div id="overlay" class="modal-overlay hidden" onclick="closeModal(event)"><div id="modal" class="modal" onclick="event.stopPropagation()"></div></div>
+
+<script>
+const BASE_URL="https://dinky476.pythonanywhere.com";
+const EMOTICONS=[":)","XD",":P",":D","<3",">:(","B)",">:) ",":3",":(",";)","<:0",">:0","<:3",">:3","OwO","UwU"];
+let session=null,currentChannel="global",currentServerId=null,replyTarget=null;
+let friends=[],servers=[],requestsList=[],blocked=[],lastCount=-1,pollTimer=null;
+let connected=false;
+let profileCache={};
+let globalMemberUsers=[];
+let profile={status_msg:"Online",bio:"",name_color:"#CBA6F7",font_family:"Segoe UI",avatar_color:"#89B4FA",banner_color:"#313244"};
+
+function esc(s){return String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+async function api(endpoint,data){
+  try{
+    const r=await fetch(`${BASE_URL}/${endpoint}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    const raw=await r.text();
+    let out;
+    try{out=JSON.parse(raw)}catch{out={status:"error",message:`Server returned HTTP ${r.status}: ${raw.slice(0,300)}`}}
+    if(r.ok){setConnection(true)}else{setConnection(false,`HTTP ${r.status}`)}
+    return out;
+  }catch(e){setConnection(false,"offline");return {status:"error",message:"Connection error: "+e.message};}
+}
+function setConnection(ok,label){
+  connected=ok;
+  if($("conn")){$("conn").textContent=`● ${label|| (ok?"connected":"offline")}`;$('conn').style.color=ok?"var(--green)":"var(--red)";}
+}
+function autoGrow(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
+function messageKeydown(e){
+  if(e.key==="Enter" && (e.ctrlKey || !e.shiftKey)){e.preventDefault();send();}
+}
+
+
+const THEMES={
+ midnight:{name:"Midnight",kind:"solid",vars:{"--bg":"#0f0f17","--panel":"#11111b","--surface":"#181825","--input":"#1e1e2e","--hover":"#313244","--purple":"#cba6f7","--blue":"#89b4fa","--green":"#a6e3a1","--red":"#f38ba8","--text":"#cdd6f4","--sub":"#a6adc8"}},
+ ocean:{name:"Ocean",kind:"solid",vars:{"--bg":"#071923","--panel":"#0b2530","--surface":"#103544","--input":"#154554","--hover":"#1d5b6e","--purple":"#7dd3fc","--blue":"#38bdf8","--green":"#86efac","--red":"#fda4af","--text":"#e0f2fe","--sub":"#9cc7d8"}},
+ sunset:{name:"Sunset",kind:"gradient",vars:{"--bg":"#21131b","--panel":"#2b1720","--surface":"#3a1f29","--input":"#492632","--hover":"#623343","--purple":"#f9a8d4","--blue":"#fdba74","--green":"#bef264","--red":"#fb7185","--text":"#ffe4e6","--sub":"#d8a9b4"}},
+ forest:{name:"Forest",kind:"solid",vars:{"--bg":"#0c1712","--panel":"#102019","--surface":"#183026","--input":"#1e3b2e","--hover":"#2b5140","--purple":"#86efac","--blue":"#67e8f9","--green":"#bef264","--red":"#fca5a5","--text":"#dcfce7","--sub":"#9cc9ad"}},
+ neon:{name:"Neon",kind:"gradient",vars:{"--bg":"#090512","--panel":"#11091b","--surface":"#1a0d28","--input":"#241139","--hover":"#3b1b57","--purple":"#f0abfc","--blue":"#67e8f9","--green":"#5eead4","--red":"#fb7185","--text":"#fae8ff","--sub":"#c4a5d4"}},
+ aurora:{name:"Aurora",kind:"gradient",vars:{"--bg":"#07151a","--panel":"#0b2025","--surface":"#12313a","--input":"#16424b","--hover":"#205b61","--purple":"#a7f3d0","--blue":"#67e8f9","--green":"#86efac","--red":"#fda4af","--text":"#ecfeff","--sub":"#9fd5d8"}},
+ candy:{name:"Candy",kind:"gradient",vars:{"--bg":"#2a1025","--panel":"#35152f","--surface":"#461b3e","--input":"#57214b","--hover":"#70305e","--purple":"#f9a8d4","--blue":"#a5b4fc","--green":"#bbf7d0","--red":"#fda4af","--text":"#fff1f8","--sub":"#e7b6d3"}},
+ lava:{name:"Lava",kind:"gradient",vars:{"--bg":"#1d0707","--panel":"#2b0b0b","--surface":"#3d1110","--input":"#521713","--hover":"#702119","--purple":"#fb7185","--blue":"#fdba74","--green":"#fde68a","--red":"#f43f5e","--text":"#fff7ed","--sub":"#e8b6a8"}},
+ ice:{name:"Ice",kind:"gradient",vars:{"--bg":"#07131f","--panel":"#0b1d2d","--surface":"#102d42","--input":"#153d58","--hover":"#205575","--purple":"#bae6fd","--blue":"#38bdf8","--green":"#a7f3d0","--red":"#fda4af","--text":"#eff6ff","--sub":"#a8c7dc"}},
+ cyber:{name:"Cyberpunk",kind:"stripes",vars:{"--bg":"#10051b","--panel":"#170722","--surface":"#210a31","--input":"#2d0e40","--hover":"#46165e","--purple":"#e879f9","--blue":"#22d3ee","--green":"#2dd4bf","--red":"#fb7185","--text":"#f5f3ff","--sub":"#c4b5fd"}},
+ rainbow:{name:"Rainbow",kind:"gradient",vars:{"--bg":"#150b20","--panel":"#1e1030","--surface":"#2b1640","--input":"#391b50","--hover":"#51276c","--purple":"#f0abfc","--blue":"#93c5fd","--green":"#86efac","--red":"#fda4af","--text":"#fff7ff","--sub":"#d8b4e8"}},
+ sunrise:{name:"Sunrise",kind:"gradient",vars:{"--bg":"#241008","--panel":"#35170b","--surface":"#48210d","--input":"#5b2a0e","--hover":"#793a13","--purple":"#f9a8d4","--blue":"#fdba74","--green":"#bef264","--red":"#fb7185","--text":"#fff7ed","--sub":"#e6b99c"}},
+ twilight:{name:"Twilight",kind:"gradient",vars:{"--bg":"#0c0920","--panel":"#14102d","--surface":"#1d1740","--input":"#292052","--hover":"#3c2d70","--purple":"#c4b5fd","--blue":"#818cf8","--green":"#a7f3d0","--red":"#fda4af","--text":"#f5f3ff","--sub":"#bbb0dc"}},
+ matrix:{name:"Matrix",kind:"stripes",vars:{"--bg":"#030b06","--panel":"#06130a","--surface":"#09200f","--input":"#0d2b14","--hover":"#15451e","--purple":"#4ade80","--blue":"#22c55e","--green":"#86efac","--red":"#fb7185","--text":"#dcfce7","--sub":"#86b89a"}},
+ sakura:{name:"Sakura",kind:"gradient",vars:{"--bg":"#210d18","--panel":"#2e1221","--surface":"#42182e","--input":"#57203b","--hover":"#71304e","--purple":"#f9a8d4","--blue":"#c4b5fd","--green":"#bbf7d0","--red":"#fb7185","--text":"#fff1f8","--sub":"#dfb0c8"}},
+ stripes:{name:"Stripes",kind:"stripes",vars:{"--bg":"#101018","--panel":"#171722","--surface":"#202033","--input":"#292941","--hover":"#3b3b5b","--purple":"#a78bfa","--blue":"#60a5fa","--green":"#86efac","--red":"#fb7185","--text":"#f1f5f9","--sub":"#aeb6c5"}},
+ gradient:{name:"Dream Gradient",kind:"gradient",vars:{"--bg":"#101020","--panel":"#191934","--surface":"#242448","--input":"#30305c","--hover":"#47477c","--purple":"#c4b5fd","--blue":"#67e8f9","--green":"#a7f3d0","--red":"#fda4af","--text":"#f8fafc","--sub":"#b7b9d5"}},
+ prism:{name:"Prism",kind:"stripes",vars:{"--bg":"#0e1018","--panel":"#171a27","--surface":"#22263a","--input":"#2d324a","--hover":"#414866","--purple":"#c4b5fd","--blue":"#7dd3fc","--green":"#86efac","--red":"#fda4af","--text":"#f8fafc","--sub":"#b9c0d1"}},
+ galaxy:{name:"Galaxy",kind:"gradient",vars:{"--bg":"#080617","--panel":"#100b27","--surface":"#19103b","--input":"#24164f","--hover":"#382477","--purple":"#d8b4fe","--blue":"#818cf8","--green":"#67e8f9","--red":"#fb7185","--text":"#f5f3ff","--sub":"#b9add5"}},
+ gold:{name:"Gold",kind:"gradient",vars:{"--bg":"#171107","--panel":"#241a09","--surface":"#33250c","--input":"#43300f","--hover":"#5b4216","--purple":"#fde68a","--blue":"#fcd34d","--green":"#bef264","--red":"#fb7185","--text":"#fffbeb","--sub":"#d7c79d"}}
+};
+function applyTheme(id){const owned=savedThemes();if(!owned.includes(id)){return error("🔒 That theme is locked! Buy it from the shop first.");}const t=THEMES[id]||THEMES.midnight;for(const [k,v] of Object.entries(t.vars))document.documentElement.style.setProperty(k,v);const body=document.body;body.dataset.themeKind=t.kind;body.style.backgroundImage=t.kind==="gradient"?"linear-gradient(135deg,#0000 0%,#ffffff08 50%,#0000 100%)":t.kind==="stripes"?"repeating-linear-gradient(135deg,#ffffff08 0 8px,#0000 8px 20px)":"none";localStorage.setItem("dinky_theme",id);}
+function savedThemes(){try{return JSON.parse(localStorage.getItem("dinky_owned_themes")||'["midnight"]')}catch{return ["midnight"]}}
+function setOwnedThemes(list){localStorage.setItem("dinky_owned_themes",JSON.stringify(Array.from(new Set(["midnight",...(list||[])]))));}
+function themeModal(){const owned=savedThemes();openModal(`<h2>🎨 Themes</h2><p style="color:var(--sub);margin-bottom:12px">${owned.length}/${Object.keys(THEMES).length} unlocked.</p>${Object.entries(THEMES).map(([id,t])=>{const ok=owned.includes(id);return `<div class="card"><span>${esc(t.name)} ${t.kind!=="solid"?`<small style="color:var(--sub)">✨ ${t.kind}</small>`:""}</span><button class="small ${ok?"primary":"secondary"}" ${ok?`onclick="applyTheme('${id}');themeModal()"`:"disabled"}>${ok?"Use":"🔒 Locked"}</button></div>`}).join("")}<button class="small" style="margin-top:8px;background:var(--hover);color:var(--text)" onclick="closeModal()">Close</button>`);}
+const PROFILE_BORDERS={default:{name:"Default",css:"2px solid var(--hover)"},glow:{name:"Glow",css:"2px solid #f0abfc;box-shadow:0 0 10px #f0abfc"},rainbow:{name:"Rainbow",css:"3px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f) border-box"},dashed:{name:"Dashed",css:"3px dashed var(--blue)"},gold:{name:"Gold",css:"3px solid #f5c542;box-shadow:0 0 8px #f5c542"},neon:{name:"Neon",css:"3px solid #22d3ee;box-shadow:0 0 12px #22d3ee"}};
+const PROFILE_BACKGROUNDS={default:{name:"Default",css:"var(--surface)"},dots:{name:"Dots",css:"radial-gradient(circle,#ffffff18 1px,transparent 1px) 0 0/10px 10px,var(--surface)"},stars:{name:"Stars",css:"radial-gradient(circle,#fff 1px,transparent 1.5px) 0 0/22px 22px,var(--surface)"},gradient:{name:"Soft Gradient",css:"linear-gradient(135deg,#cba6f733,#89b4fa22),var(--surface)"},rainbow:{name:"Rainbow",css:"linear-gradient(135deg,#ff000033,#ffff0033,#00ff0033,#00ffff33,#0000ff33,#ff00ff33),var(--surface)"},grid:{name:"Grid",css:"linear-gradient(#ffffff0c 1px,transparent 1px),linear-gradient(90deg,#ffffff0c 1px,transparent 1px),var(--surface);background-size:14px 14px"}};
+function cosmeticOwned(kind,id){const o=window.profileCosmetics||{borders:["default"],backgrounds:["default"]};return (o[kind]||[]).includes(id)}
+function profileCosmetics(){const o=window.profileCosmetics||{borders:["default"],backgrounds:["default"]};openModal(`<h2>✨ Profile Cosmetics</h2><p style="color:var(--sub)">Equip things you've bought from the shop.</p><label>Profile border</label><select id="pcBorder">${Object.entries(PROFILE_BORDERS).map(([id,x])=>`<option value="${id}" ${o.borders.includes(id)?"":"disabled"}>${x.name}${o.borders.includes(id)?"":" 🔒"}</option>`).join("")}</select><label>Profile background</label><select id="pcBg">${Object.entries(PROFILE_BACKGROUNDS).map(([id,x])=>`<option value="${id}" ${o.backgrounds.includes(id)?"":"disabled"}>${x.name}${o.backgrounds.includes(id)?"":" 🔒"}</option>`).join("")}</select><button class="small primary" onclick="saveProfileCosmetics()">Save cosmetics</button>`)}
+async function saveProfileCosmetics(){const r=await api("update_profile_cosmetics",{username:session.username,token:session.token,profile_border:$('pcBorder').value,profile_background:$('pcBg').value});if(r.status!=="success")return error(r.message||"Couldn't save cosmetics.");profile.profile_border=r.profile_border;profile.profile_background=r.profile_background;closeModal();alert("Profile cosmetics equipped! ✨");}
+async function shop(){const r=await api("get_shop_data",{username:session.username,token:session.token});if(r.status!=="success")return error(r.message||"Shop failed.");setOwnedThemes(r.owned_themes||["midnight"]);window.profileCosmetics=r.owned_profile_cosmetics||{borders:["default"],backgrounds:["default"]};openModal(`<h2>🛍️ Dinky Shop</h2><div style="font-weight:700;margin-bottom:12px">🪙 ${r.coins} coins</div><button class="small primary" onclick="claimCoins()">Claim daily +50</button><button class="small" style="margin-left:5px;background:var(--hover);color:var(--text)" onclick="hostShop()">Host a Shop</button><button class="small" style="margin-left:5px;background:#F38BA8;color:#111" onclick="openDailyBox()">🎁 Daily Reward</button><hr><p style="color:var(--sub);font-size:12px">✨ Fixed-price cosmetics only — no wagering.</p>${(r.shops||[]).map(sh=>`<h3 style="margin-top:12px">${esc(sh.name)} <small style="color:var(--sub)">by @${esc(sh.owner)}</small></h3><p style="color:var(--sub);font-size:12px">${esc(sh.description||"")}</p>${(sh.items||[]).map(it=>{const typ=it.item_type||"theme";const ident=typ==="theme"?it.theme_id:it.cosmetic_id;const own=typ==="theme"?savedThemes().includes(ident):cosmeticOwned(typ==="border"?"borders":"backgrounds",ident);const label=typ==="theme"?(THEMES[ident]?.name||ident):(typ==="border"?(PROFILE_BORDERS[ident]?.name||ident):(PROFILE_BACKGROUNDS[ident]?.name||ident));return `<div class="card"><span>${esc(it.name)}<br><small style="color:var(--sub)">${esc(label)} · ${typ} · 🪙 ${it.price}</small></span><button class="small ${own?"secondary":"primary"}" ${own?"disabled":`onclick="buyItem('${esc(sh.owner)}','${esc(it.id)}')"`}>${own?"Owned":"Buy"}</button></div>`}).join("")}`).join("")}`);}
+async function claimCoins(){const r=await api("claim_coins",{username:session.username,token:session.token});if(r.status!=="success")return alert(r.message||"Already claimed.");alert(r.message||"Done");shop();}
+async function buyItem(owner,item){const r=await api("buy_shop_item",{username:session.username,token:session.token,owner,item_id:item});if(r.status!=="success")return alert(r.message||"Purchase failed.");const owned=savedThemes();if(r.item_type==="theme"&&r.theme_id&&!savedThemes().includes(r.theme_id)){const owned=savedThemes();owned.push(r.theme_id);setOwnedThemes(owned);} if(r.item_type==="border"){window.profileCosmetics=window.profileCosmetics||{borders:["default"],backgrounds:["default"]};window.profileCosmetics.borders.push(r.cosmetic_id);} if(r.item_type==="background"){window.profileCosmetics=window.profileCosmetics||{borders:["default"],backgrounds:["default"]};window.profileCosmetics.backgrounds.push(r.cosmetic_id);}alert(r.already_owned?"You already own that theme!":"Purchased! ✨");shop();}
+async function openDailyBox(){const r=await api("open_daily_box",{username:session.username,token:session.token});if(r.status!=="success")return alert(r.message||"Daily reward unavailable.");alert("🎁 "+r.message);shop();}
+async function deleteMyShop(){const p1=prompt("Enter your DinkyChat password to delete your shop:");if(p1===null)return;const p2=prompt("Enter your password again to confirm:");if(p2===null)return;const r=await api("delete_shop",{username:session.username,token:session.token,pass1:p1,pass2:p2});if(r.status!=="success")return alert(r.message||"Could not delete shop.");alert("Shop deleted.");shop();}
+async function hostShop(){openModal(`<h2>🏪 Host a Shop</h2><input id="shopName" placeholder="Shop name"><textarea id="shopDesc" placeholder="Description"></textarea><button class="small primary" onclick="createMyShop()">Create / Save Shop</button><button class="small" style="margin-left:5px;background:#F38BA8;color:#111" onclick="deleteMyShop()">🗑 Delete My Shop</button><hr><h3>Add Cosmetic Item</h3><input id="itemName" placeholder="Item name"><select id="itemType" onchange="updateShopValueOptions()" style="width:100%;padding:9px;margin:4px 0 10px;background:var(--input);color:var(--text);border:0;border-radius:5px"><option value="theme">Theme</option><option value="border">Profile Border</option><option value="background">Profile Background</option></select><select id="itemTheme" style="width:100%;padding:9px;margin:4px 0 10px;background:var(--input);color:var(--text);border:0;border-radius:5px">${Object.entries(THEMES).map(([id,t])=>`<option value="${id}">${t.name}</option>`).join("")}</select><input id="itemPrice" type="number" min="1" placeholder="Price"><button class="small primary" onclick="addMyItem()">Add Item</button><p style="color:var(--sub);font-size:11px">For borders/backgrounds, type the cosmetic ID manually into the value selector if needed: glow, rainbow, dashed, gold, neon / dots, stars, gradient, rainbow, grid.</p>`);}
+function updateShopValueOptions(){const sel=$('itemTheme');if(!$('itemType'))return;const typ=$('itemType').value;const vals=typ==='theme'?Object.entries(THEMES).map(([id,t])=>[id,t.name]):typ==='border'?Object.entries(PROFILE_BORDERS).map(([id,t])=>[id,t.name]):Object.entries(PROFILE_BACKGROUNDS).map(([id,t])=>[id,t.name]);sel.innerHTML=vals.map(([id,n])=>`<option value="${id}">${n}</option>`).join("");}
+async function createMyShop(){const r=await api("create_shop",{username:session.username,token:session.token,name:$('shopName').value,description:$('shopDesc').value});if(r.status!=="success")return alert(r.message||"Could not create shop.");alert("Shop saved!");hostShop();}
+async function addMyItem(){const r=await api("add_shop_item",{username:session.username,token:session.token,item_name:$('itemName').value,theme_id:$('itemTheme').value,cosmetic_id:$('itemTheme').value,item_type:$('itemType').value,price:$('itemPrice').value});if(r.status!=="success")return alert(r.message||"Could not add item.");alert("Item added! ✨");shop();}
+function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
+window.onload=()=>{
+  setupEmoji();applyTheme(localStorage.getItem("dinky_theme")||"midnight");
+  const s=localStorage.getItem("dinky_session"), st=settingsData();
+  if(s&&st.auto_login){try{session=JSON.parse(s);startApp()}catch{}}
+};
+async function login(){
+  const username=$("user").value.trim(),password=$("pass").value.trim();
+  if(!username||!password)return error("Fill in all fields.");
+  const r=await api("login",{username,password});
+  if(r.status==="success"){
+    session=r;localStorage.setItem("dinky_session",JSON.stringify(r));
+    localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("auto").checked}));startApp();
+  }else error(r.message||"Login failed.");
+}
+async function register(){
+  const username=$("user").value.trim(),password=$("pass").value.trim();
+  if(!username||!password)return error("Fill in all fields.");
+  const r=await api("register",{username,password});
+  if(r.status==="success")alert("Account created successfully! You can now log in.");
+  else error(r.message||"Registration failed.");
+}
+function error(x){$("error").textContent=x}
+function startApp(){
+  $("auth-screen").classList.add("hidden");$("app").classList.remove("hidden");
+  poll();pollTimer=setInterval(poll,1000);
+  setTimeout(()=>$("message").focus(),50);
+}
+function logout(){if(!confirm("Log out of Dinky Chat?"))return;localStorage.removeItem("dinky_session");clearInterval(pollTimer);location.reload()}
+function $(id){return document.getElementById(id)}
+async function poll(){
+  if(!session)return;
+  const r=await api("get_social_data",{username:session.username,token:session.token});
+  if(r.status==="success"){
+    friends=r.friends||[];servers=r.servers||[];requestsList=r.pending_requests||[];blocked=r.blocked_users||[];
+    $("reqs").textContent=`Requests (${requestsList.length})`;renderSidebar();
+    if(currentServerId)renderMembers();
+  }
+  if(currentChannel==="friends_tab")return;
+  let ch=currentChannel;
+  if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
+  const m=await api("get_messages",{username:session.username,token:session.token,channel:ch});
+  const msgs=m.messages||[];
+  if(currentChannel==="global")await updateGlobalMembers(msgs);
+  if(msgs.length!==lastCount){
+    const box=$("messages");
+    const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+    lastCount=msgs.length;renderMessages(msgs);
+    if(!nearBottom)box.scrollTop=box.dataset.previousScroll||0;
+  }
+}
+function renderSidebar(){
+  const q=$("search").value.toLowerCase();
+  $("servers").innerHTML="";
+  servers.forEach(s=>{
+    if(q&&!s.name.toLowerCase().includes(q))return;
+    const box=document.createElement("div");
+    box.innerHTML=`<div class="server-head">🏠 ${esc(s.name)}</div>`;
+    (s.channels||["general"]).forEach(c=>{
+      const b=document.createElement("button");b.className="nav sub"+(currentChannel===`server_${s.id}_${c}`?" active":"");
+      b.textContent=`# ${c}`;b.onclick=()=>switchChannel(`server_${s.id}_${c}`,s.id);box.appendChild(b);
+    });$("servers").appendChild(box);
+  });
+  $("friends").innerHTML="";
+  friends.forEach(f=>{
+    if(q&&!f.username.toLowerCase().includes(q))return;
+    const b=document.createElement("button");b.className="nav"+(currentChannel===f.username?" active":"");
+    b.textContent=`💬 ${f.username}`;b.onclick=()=>switchChannel(f.username);$("friends").appendChild(b);
+  });
+}
+function switchChannel(ch,serverId=null){
+  currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
+  $("actions").innerHTML="";
+  if(serverId){
+    $("member").classList.remove("hidden");
+    $("header").textContent="🏠 #"+ch.split("_").pop();
+    $("actions").innerHTML=`<button class="small" style="background:var(--hover);color:var(--text)" onclick="serverSettings()">⚙ Settings</button>
+      <button class="small primary" onclick="createChannel()">+ Channel</button>
+      <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>`;
+    renderMembers();
+  }else if(ch==="global"){
+    $("member").classList.remove("hidden");
+    $("header").textContent="# global-chat";
+    renderGlobalMembers();
+  }else{
+    $("member").classList.add("hidden");
+    $("header").textContent=ch==="friends_tab"?"👥 Friends Hub":`💬 DM @${ch}`;
+  }
+  renderSidebar();
+}
+function renderMembers(){
+  const s=servers.find(x=>String(x.id)===String(currentServerId));
+  const box=$("members");
+  box.innerHTML="";
+  $("member").querySelector(".section").textContent="MEMBERS";
+  if(!s){
+    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No members available.</div>';
+    return;
+  }
+  const list=Array.isArray(s.members)?s.members:[];
+  if(!list.length){
+    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No members available.</div>';
+    return;
+  }
+  list.forEach(u=>{
+    const b=document.createElement("button");
+    b.className="nav";
+    b.textContent=`• @${u}`;
+    b.title="View profile";
+    b.onclick=()=>viewProfile(u);
+    box.appendChild(b);
+  });
+}
+async function updateGlobalMembers(msgs){
+  const users=[...new Set(msgs.map(m=>m.sender).filter(Boolean))];
+  globalMemberUsers=users;
+  renderGlobalMembers();
+
+  for(const u of users){
+    if(Object.prototype.hasOwnProperty.call(profileCache,u))continue;
+    const res=await api("get_user_profile",{
+      username:session.username,token:session.token,target:u
+    });
+    profileCache[u]=res.status==="success"?res.profile:null;
+  }
+  if(currentChannel==="global")renderGlobalMembers();
+}
+function renderGlobalMembers(){
+  if(currentChannel!=="global")return;
+  $("member").classList.remove("hidden");
+  $("member").querySelector(".section").textContent="PUBLIC MEMBERS";
+  const box=$("members");
+  box.innerHTML="";
+  const publicUsers=globalMemberUsers.filter(u=>u===session.username||profileCache[u]);
+
+  if(!publicUsers.length){
+    box.innerHTML='<div style="color:var(--sub);font-size:12px;padding:8px 4px">No public profiles in global yet.</div>';
+    return;
+  }
+
+  publicUsers.forEach(u=>{
+    const p=profileCache[u]||{};
+    const b=document.createElement("button");
+    b.className="nav";
+    const status=p.status||"";
+    b.innerHTML=`<span>• @${esc(u)}</span>${status?`<span style="font-size:10px;color:var(--sub)">${esc(status)}</span>`:""}`;
+    b.title="View profile";
+    b.onclick=()=>viewProfile(u);
+    box.appendChild(b);
+  });
+}
+function renderMessages(msgs){
+  const box=$("messages");
+  const oldScroll=box.scrollTop;
+  box.dataset.previousScroll=oldScroll;
+  box.innerHTML="";
+  msgs.forEach((m,i)=>{
+    if(blocked.includes(m.sender))return;
+    let text=m.text||"",reply="";
+    if(text.startsWith("↳ Replying to")){
+      const p=text.split("\n");reply=`<div class="reply-preview">${esc(p[0])}</div>`;text=p.slice(1).join("\n");
+    }
+    const div=document.createElement("div");div.className="msg"+(text.includes("@"+session.username)?" ping":"");
+    const a=document.createElement("span");a.className="author";a.textContent=m.sender;a.style.color=m.name_color||"#CBA6F7";a.onclick=()=>viewProfile(m.sender);
+    const head=document.createElement("div");head.appendChild(a);
+    div.innerHTML=reply;div.appendChild(head);
+    const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body);
+    div.oncontextmenu=e=>{e.preventDefault();messageMenu(e,m.sender,text,m.id??i,!!m.is_owner)};$("messages").appendChild(div);
+  });
+  if(oldScroll>=0 && box.scrollHeight-box.clientHeight-oldScroll<80)box.scrollTop=box.scrollHeight;
+  else box.scrollTop=oldScroll;
+}
+function messageMenu(e,sender,text,id,owner){
+  const items=[["Reply",()=>setReply(sender,text)]];
+  if(sender===session.username||owner)items.push(["🗑 Delete Message",()=>deleteMessage(id)]);
+  showMenu(e.clientX,e.clientY,items);
+}
+function showMenu(x,y,items){
+  document.querySelectorAll(".popup").forEach(x=>x.remove());
+  const d=document.createElement("div");d.className="popup";d.style.cssText=`position:fixed;left:${x}px;top:${y}px;z-index:999;background:var(--surface);border:1px solid var(--hover);border-radius:6px;padding:4px;box-shadow:0 4px 12px #0008`;
+  items.forEach(([t,fn])=>{const b=document.createElement("button");b.className="nav";b.textContent=t;b.onclick=()=>{d.remove();fn()};d.appendChild(b)});document.body.appendChild(d);
+}
+document.addEventListener("click",()=>document.querySelectorAll(".popup").forEach(x=>x.remove()));
+function setReply(sender,text){const clean=text.split("\n")[0].slice(0,45)+(text.length>45?"...":"");replyTarget={sender,text:clean};$("replytext").textContent=`Replying to @${sender}: "${clean}"`;$("replybar").classList.remove("hidden");$("message").focus()}
+function cancelReply(){replyTarget=null;$("replybar").classList.add("hidden")}
+async function send(){
+  let text=$("message").value.trim();if(!text||currentChannel==="friends_tab")return;
+  $("message").value="";
+  if(replyTarget)text=`↳ Replying to @${replyTarget.sender}: "${replyTarget.text}"\n${text}`;
+  let ch=currentChannel;if(ch!=="global"&&!ch.startsWith("server_"))ch=[session.username,currentChannel].sort().join("-");
+  cancelReply();const r=await api("send_message",{username:session.username,token:session.token,channel:ch,text});
+  if(r.status==="error")alert(r.message||"Failed to send message.");poll();
+}
+async function deleteMessage(id){const r=await api("delete_message",{username:session.username,token:session.token,msg_id:id});if(r.status!=="success")alert(r.message||"Could not delete message.");poll()}
+function friendsTab(){switchChannel("friends_tab");$("messages").innerHTML="<h2 style='color:var(--purple)'>=== FRIENDS HUB ===</h2>"+friends.map(f=>`<button class="nav">• @${esc(f.username)} — Status: ${esc(f.status||"Offline")}</button>`).join("")}
+function setupEmoji(){EMOTICONS.forEach(e=>{const b=document.createElement("button");b.className="small";b.style.cssText="background:var(--input);color:var(--text)";b.textContent=e;b.onclick=()=>{$("message").value+=e;$("emoji").classList.add("hidden")};$("emoji").appendChild(b)})}
+function toggleEmoji(){$("emoji").classList.toggle("hidden")}
+function openModal(content){$("modal").innerHTML=content;$("overlay").classList.remove("hidden")}
+function closeModal(e){if(!e||e.target===$("overlay"))$("overlay").classList.add("hidden")}
+async function addFriend(){
+  const target=prompt("Enter username to add:");if(!target)return;
+  const r=await api("send_friend_request",{username:session.username,token:session.token,target:target.trim()});
+  alert(r.message||(r.status==="success"?"Request sent!":"Failed."));poll();
+}
+async function createServer(){
+  const raw=prompt("Enter Server Name:");
+  if(raw===null)return;
+  const name=raw.trim();
+  if(!name)return alert("Server name cannot be empty.");
+  if(name.length>80)return alert("Server name is too long (max 80 characters).");
+  const r=await api("create_server",{username:session.username,token:session.token,name});
+  if(r.status==="success"){
+    alert(`Server '${name}' created!`);await poll();
+  }else{
+    alert(`Could not create server.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
+  }
+}
+async function createChannel(){
+  if(!currentServerId)return;
+  const raw=prompt("Enter channel name:");
+  if(raw===null)return;
+  const cname=raw.trim().toLowerCase().replace(/\s+/g,"-");
+  if(!cname)return alert("Channel name cannot be empty.");
+  if(cname.length>80)return alert("Channel name is too long (max 80 characters).");
+  const r=await api("create_server_channel",{username:session.username,token:session.token,server_id:currentServerId,channel_name:cname});
+  if(r.status==="success"){alert("Channel created!");await poll();}
+  else alert(`Could not create channel.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
+}
+async function deleteChannel(){
+  if(!currentServerId||currentChannel.endsWith("_general"))return alert("Cannot delete general channel or non-server channel.");
+  if(!confirm("Are you sure you want to delete this channel?"))return;
+  const r=await api("delete_server_channel",{username:session.username,token:session.token,server_id:currentServerId,channel:currentChannel});
+  if(r.status==="success"){alert("Channel deleted.");switchChannel("global")}else alert(r.message||"Could not delete channel.");
+}
+async function discover(){
+  openModal(`<h2>Discover — Servers & People</h2><div id="discoverLoading" style="color:var(--sub);padding:10px">Loading discovery...</div>`);
+  try{
+    const [r,p]=await Promise.all([
+      api("get_public_servers",{username:session.username,token:session.token}),
+      api("get_discover_profiles",{username:session.username,token:session.token})
+    ]);
+    if(r.status!=="success"){
+      $("modal").innerHTML=`<h2>Discover — Servers & People</h2><div style="color:var(--red);padding:10px">Could not load public servers.<br><small>${esc(r.message||JSON.stringify(r))}</small></div>`;
+      return;
+    }
+    const pub=Array.isArray(r.servers)?r.servers:[];
+    const people=p.status==="success"&&Array.isArray(p.profiles)?p.profiles:[];
+    $("modal").innerHTML=`<h2>Discover — Servers & People</h2>
+      <input id="discoverSearch" placeholder="Search servers and people..." oninput="filterDiscover()">
+      <h3>Servers <span id="serverCount" style="color:var(--sub);font-size:11px">(${pub.length})</span></h3>
+      <div id="discoverServers">${pub.map(s=>{
+        const sid=JSON.stringify(String(s.id));
+        const search=esc(String(s.name||"")+" "+String(s.description||"")+" "+(Array.isArray(s.tags)?s.tags.join(" "):""));
+        return `<div class="card discover-item" data-kind="server" data-search="${search.toLowerCase()}"><div><b>${esc(s.name||"Unnamed server")}</b><div style="color:var(--sub);font-size:11px">${esc(s.description||"")} ${s.members_count!=null?`• ${s.members_count} member${s.members_count==1?"":"s"}`:""}</div></div><button class="small" style="background:var(--green);color:#111" onclick='joinServer(${sid})'>Join</button></div>`;
+      }).join("")||"<span style='color:var(--sub)'>No public servers.</span>"}</div>
+      <hr><h3>People <span style="color:var(--sub);font-size:11px">(${people.length})</span></h3>
+      <div id="discoverPeople">${people.map(x=>{
+        const u=JSON.stringify(String(x.username||""));
+        const search=esc(String(x.username||"")+" "+String(x.status||"")+" "+String(x.bio||""));
+        return `<div class="card discover-item" data-kind="person" data-search="${search.toLowerCase()}"><span>@${esc(x.username||"")} (${esc(x.status||"Offline")})</span><button class="small primary" onclick='sendDiscover(${u})'>+ Add Friend</button></div>`;
+      }).join("")||"<span style='color:var(--sub)'>No discoverable profiles.</span>"}</div>`;
+  }catch(e){
+    $("modal").innerHTML=`<h2>Discover — Servers & People</h2><div style="color:var(--red);padding:10px">Discovery failed.<br><small>${esc(String(e))}</small></div>`;
+  }
+}
+function filterDiscover(){
+  const q=($( "discoverSearch")?.value||"").toLowerCase().trim();
+  document.querySelectorAll(".discover-item").forEach(el=>{
+    el.style.display=!q||el.dataset.search.includes(q)?"flex":"none";
+  });
+}
+async function joinServer(id){
+  id=String(id||"").trim();
+  if(!id)return alert("Invalid server ID.");
+  const r=await api("join_public_server",{username:session.username,token:session.token,server_id:id});
+  if(r.status==="success"){
+    alert(r.message||"Joined server successfully!");
+    closeModal();
+    await poll();
+  }else{
+    alert(`Could not join server.\n\nBackend response: ${r.message||JSON.stringify(r)}`);
+  }
+}
+async function sendDiscover(u){
+  u=String(u||"").trim();
+  if(!u||u===session.username)return alert("Please choose another user.");
+  const r=await api("send_friend_request",{username:session.username,token:session.token,target:u});
+  alert(r.message||(r.status==="success"?"Friend request sent!":"Failed."));
+  if(r.status==="success")await poll();
+}
+async function requests(){
+  openModal(`<h2>Friend Requests</h2><div id="requestList">${requestsList.length?requestsList.map(u=>`<div class="card"><span>@${esc(u)}</span><span><button class="small" style="background:var(--green);color:#111" onclick="respond('${esc(u)}','accept')">Accept</button> <button class="small" style="background:var(--red);color:#111" onclick="respond('${esc(u)}','decline')">Decline</button></span></div>`).join(""):"<span style='color:var(--sub)'>No pending requests.</span>"}</div>`);
+}
+async function respond(u,action){await api("respond_friend_request",{username:session.username,token:session.token,sender:u,action});closeModal();poll()}
+async function serverSettings(){
+  const s=servers.find(x=>x.id===currentServerId);if(!s)return;
+  if(s.owner!==session.username)return alert("Only the server owner can modify these settings.");
+  openModal(`<h2>Server Management</h2>
+    <button class="btn secondary" onclick="togglePublic()">Toggle Public / Private Visibility</button>
+    <button class="btn secondary" onclick="toggleCreation()">Toggle Channel Creation (Everyone vs Owner)</button>
+    <button class="btn" style="background:var(--red);color:#111" onclick="deleteServer()">🗑 Delete Server</button>`);
+}
+async function togglePublic(){const r=await api("toggle_server_public",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||"Updated!");poll()}
+async function toggleCreation(){const r=await api("toggle_channel_creation_perm",{username:session.username,token:session.token,server_id:currentServerId});alert(r.message||`Channel creation set to: ${r.channel_creation_perm||"everyone"}`);poll()}
+async function deleteServer(){
+  openModal(`<h2 style="color:var(--red)">Delete Server</h2><p style="margin-bottom:10px">Enter password twice to delete.</p><input id="del1" type="password" placeholder="Password"><input id="del2" type="password" placeholder="Confirm Password"><button class="btn" style="background:var(--red);color:#111" onclick="confirmDeleteServer()">Delete Server Permanently</button>`);
+}
+async function confirmDeleteServer(){
+  const r=await api("delete_server",{username:session.username,token:session.token,server_id:currentServerId,pass1:$("del1").value,pass2:$("del2").value});
+  if(r.status==="success"){alert("Server deleted.");closeModal();switchChannel("global");poll()}else alert(r.message||"Failed to delete server.");
+}
+async function settings(){
+  const st=settingsData();
+  openModal(`<h2>Style & Settings</h2>
+    <label>Username Color</label><input id="nameColor" type="color" value="${profile.name_color}">
+    <label>Avatar Color</label><input id="avatarColor" type="color" value="${profile.avatar_color}">
+    <label>Banner Color</label><input id="bannerColor" type="color" value="${profile.banner_color}">
+    <label>Font Family</label><input id="font" value="${esc(profile.font_family)}">
+    <label>Status Preset</label><input id="status" value="${esc(profile.status_msg)}">
+    <label>Bio</label><textarea id="bio">${esc(profile.bio)}</textarea>
+    <button class="btn secondary" onclick="toggleProfile()">Toggle Public Profile (Discoverability)</button>
+    <button class="btn secondary" onclick="copyUsername()">📋 Copy My Username</button>
+    <label class="checkbox"><input id="autoSet" type="checkbox" ${st.auto_login?"checked":""}> Auto Login on Startup</label>
+    <button class="btn secondary" onclick="profileCosmetics()">✨ Profile Cosmetics</button><button class="btn primary" onclick="saveSettings()">Save Profile & Settings</button>`);
+}
+async function toggleProfile(){const r=await api("toggle_profile_public",{username:session.username,token:session.token});alert(r.message||"Updated profile visibility.")}
+async function copyUsername(){
+  try{await navigator.clipboard.writeText(session.username);alert(`Copied @${session.username}`)}
+  catch{alert(`Your username is @${session.username}`)}
+}
+async function saveSettings(){
+  profile.name_color=$("nameColor").value;profile.avatar_color=$("avatarColor").value;profile.banner_color=$("bannerColor").value;
+  profile.font_family=$("font").value.trim()||"Segoe UI";profile.status_msg=$("status").value.trim()||"Online";profile.bio=$("bio").value.trim();
+  localStorage.setItem("dinky_settings",JSON.stringify({auto_login:$("autoSet").checked}));
+  await api("update_profile",{username:session.username,token:session.token,status:profile.status_msg,bio:profile.bio,name_color:profile.name_color,avatar_color:profile.avatar_color,banner_color:profile.banner_color,font_family:profile.font_family});
+  closeModal();poll();
+}
+async function viewProfile(target){
+  const r=await api("get_user_profile",{username:session.username,token:session.token,target});
+  if(r.status!=="success")return alert("Could not fetch profile.");
+  const p=r.profile||{};
+  const pb=PROFILE_BORDERS[p.profile_border||"default"]?.css||PROFILE_BORDERS.default.css;const pbg=PROFILE_BACKGROUNDS[p.profile_background||"default"]?.css||PROFILE_BACKGROUNDS.default.css;openModal(`<div class="profile-banner" style="background:${esc(p.banner_color||"#313244")}"></div><div style="width:86px;height:86px;border-radius:50%;margin:-28px auto 8px;background:${p.avatar_url?`url(${esc(p.avatar_url)}) center/cover`:esc(p.avatar_color||"#89B4FA")};border:${p.profile_border==="rainbow"?"3px solid #f0abfc":"3px solid var(--hover)"};${p.profile_border==="glow"?"box-shadow:0 0 12px #f0abfc;":""}background-image:${p.avatar_url?`url(${esc(p.avatar_url)})`:"none"};"></div><div style="padding:12px;border-radius:10px;background:${esc(pbg)};border:2px solid transparent">
+    <h2 style="color:${esc(p.name_color||"#CBA6F7")}">@${esc(p.username)}</h2>
+    <div class="status">Status: ${esc(p.status||"Offline")}</div>
+    <div class="bio">${esc(p.bio||"No bio provided.")}</div>
+    ${target!==session.username?`<div class="row"><button class="small" style="background:var(--orange);color:#111" onclick="unfriend('${esc(target)}')">Unfriend</button><button class="small" style="background:var(--red);color:#111" onclick="block('${esc(target)}')">Block</button></div>`:""}`);
+}
+async function unfriend(u){await api("unfriend_user",{username:session.username,token:session.token,target:u});alert(`Removed @${u} from friends.`);closeModal();poll()}
+async function block(u){await api("block_user",{username:session.username,token:session.token,target:u});alert(`Blocked @${u}.`);closeModal();poll()}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    document.querySelectorAll(".popup").forEach(x=>x.remove());
+    if(!$('overlay').classList.contains('hidden'))closeModal();
+    if(replyTarget)cancelReply();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){
+    e.preventDefault();
+    if(!$('app').classList.contains('hidden')){$('search').focus();$('search').select();}
+  }
+});
+</script>
+</body>
+</html>
