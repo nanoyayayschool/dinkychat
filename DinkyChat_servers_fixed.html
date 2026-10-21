@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="en" style="--bg: #0f0f17; --panel: #11111b; --surface: #181825; --input: #1e1e2e; --hover: #313244; --purple: #cba6f7; --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8; --text: #cdd6f4; --sub: #a6adc8;"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dinky Chat — Web Edition</title>
@@ -62,14 +63,14 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
 @media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
 </style>
 </head>
-<body data-theme-kind="solid" style="background-image: none;">
+<body>
 <div id="auth-screen">
   <div class="auth-card">
     <h1>DINKY CHAT</h1><p>Sign in to start chatting</p>
     <div id="error"></div>
     <div class="form-group"><label>Username</label><input id="user"></div>
     <div class="form-group"><label>Password</label><input id="pass" type="password"></div>
-    <label class="checkbox"><input id="auto" type="checkbox" checked=""> Auto Login on Startup</label>
+    <label class="checkbox"><input id="auto" type="checkbox" checked> Auto Login on Startup</label>
     <button class="btn primary" onclick="login()">Log In</button>
     <button class="btn secondary" onclick="register()">Create Account</button>
   </div>
@@ -95,7 +96,7 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style &amp; Settings</button>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
@@ -105,13 +106,14 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
     <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
       <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
-      <div id="emoji" class="emoji hidden"><button class="small" style="background: var(--input); color: var(--text);">:)</button><button class="small" style="background: var(--input); color: var(--text);">XD</button><button class="small" style="background: var(--input); color: var(--text);">:P</button><button class="small" style="background: var(--input); color: var(--text);">:D</button><button class="small" style="background: var(--input); color: var(--text);">&lt;3</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:(</button><button class="small" style="background: var(--input); color: var(--text);">B)</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:) </button><button class="small" style="background: var(--input); color: var(--text);">:3</button><button class="small" style="background: var(--input); color: var(--text);">:(</button><button class="small" style="background: var(--input); color: var(--text);">;)</button><button class="small" style="background: var(--input); color: var(--text);">&lt;:0</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:0</button><button class="small" style="background: var(--input); color: var(--text);">&lt;:3</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:3</button><button class="small" style="background: var(--input); color: var(--text);">OwO</button><button class="small" style="background: var(--input); color: var(--text);">UwU</button></div>
+      <div id="emoji" class="emoji hidden"></div>
       <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
       <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
     </div>
   </main>
   <aside id="member" class="member hidden"><div class="section">MEMBERS</div><div id="members"></div></aside>
 </div>
+<div id="voice-panel" class="hidden" style="position:fixed;z-index:120;right:18px;bottom:18px;width:min(360px,calc(100vw - 36px));background:var(--panel);border:1px solid var(--purple);border-radius:14px;padding:14px;box-shadow:0 12px 40px #0008"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b id="voice-title">🎙️ Voice</b><span id="voice-state" style="color:var(--green);font-size:12px">Connecting…</span></div><div id="voice-people" style="padding:10px 0;color:var(--sub);font-size:13px"></div><div class="row"><button id="voice-mute" class="small" onclick="toggleVoiceMute()">🎙️ Mute</button><button id="voice-deafen" class="small" onclick="toggleVoiceDeafen()">🔊 Deafen</button><button class="small" style="background:var(--red);color:#111" onclick="leaveVoice()">☎ Leave</button></div><div id="voice-audios" class="hidden"></div></div>
 <div id="overlay" class="modal-overlay hidden" onclick="closeModal(event)"><div id="modal" class="modal" onclick="event.stopPropagation()"></div></div>
 
 <script>
@@ -203,7 +205,36 @@ async function makeEvent(){const title=prompt("Event title:");if(!title)return;c
 async function showEvents(){const r=await api("get_events",{username:session.username,token:session.token,server_id:currentServerId||""});featureResult(`<h3>Server events</h3>`+(r.events||[]).map(e=>`<p><b>${esc(e.title)}</b> — ${esc(e.when)}<br>${esc(e.description||"")}</p>`).join("")||"<p>No events scheduled.</p>")}
 async function showAchievements(){const r=await api("get_achievements",{username:session.username,token:session.token});featureResult(`<h3>Achievements</h3>`+(r.achievements||[]).map(a=>`<p>${a.earned?"🏆":"🔒"} <b>${esc(a.name)}</b> ${a.progress!==undefined?`(${a.progress}/${a.goal})`:""}</p>`).join(""))}
 async function editRichProfile(){const pronouns=prompt("Pronouns (optional):","");if(pronouns===null)return;const pinned=prompt("Pinned status (optional):","")||"";const r=await api("update_richer_profile",{username:session.username,token:session.token,pronouns,pinned_status:pinned});featureResult(`<p>${esc(r.message||(r.status==="success"?"Profile details saved.":"Could not save profile."))}</p>`)}
-function voiceInfo(){featureResult("<h3>🎙️ Voice channels</h3><p>Planned: WebRTC voice rooms with signaling, participant presence, mute/deafen and reconnect support. This needs a signaling service and may need a TURN server for reliable connections; no fake join button here.</p>")}
+let voiceState={roomId:null,serverId:"",kind:"",target:"",stream:null,peers:{},pollTimer:null,memberTimer:null,muted:false,deafened:false,seenOffers:{}};
+const voiceRtcConfig={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
+function voiceRoomId(){return `server_${currentServerId}_${currentChannel.split("_").pop()}`}
+function joinServerVoice(){if(!currentServerId)return;startVoiceRoom(voiceRoomId(),"server",`Server voice · ${currentChannel.split("_").pop()}`,currentServerId)}
+async function startPrivateCall(target){if(!session)return;const roomId=`dmcall_${[session.username,target].sort().join("_")}`;const r=await api("voice_invite",{username:session.username,token:session.token,target,room_id:roomId});if(r.status!=="success")return alert(r.message||"Could not call this friend.");await startVoiceRoom(roomId,"private",`Call with @${target}`,"");setVoiceState("Calling @"+target+"…")}
+async function startVoiceRoom(roomId,kind,title,serverId=""){
+ if(voiceState.roomId)await leaveVoice(false);
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert("Microphone access needs a supported browser and a secure HTTPS page.");return}
+ try{
+  voiceState={roomId,serverId,kind,target:"",stream:null,peers:{},pollTimer:null,memberTimer:null,muted:false,deafened:false,seenOffers:{}};
+  const joined=await api("voice_join",{username:session.username,token:session.token,room_id:roomId,server_id:serverId});if(joined.status!=="success")throw Error(joined.message||"Could not join voice room.");
+  voiceState.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+  $("voice-panel").classList.remove("hidden");$("voice-title").textContent=title;$("voice-state").textContent="Connected to room";$("voice-people").textContent="Connecting audio…";
+  await syncVoicePeers();voiceState.memberTimer=setInterval(syncVoicePeers,1200);voiceState.pollTimer=setInterval(pollVoiceSignals,450);setVoiceState("Microphone ready");
+ }catch(e){alert("Voice could not start: "+e.message);await leaveVoice(false)}
+}
+function setVoiceState(t){const e=$("voice-state");if(e)e.textContent=t}
+async function syncVoicePeers(){if(!voiceState.roomId)return;const r=await api("voice_members",{username:session.username,token:session.token,room_id:voiceState.roomId});if(r.status!=="success")return;const members=r.members||[];$("voice-people").textContent=members.map(u=>(u===session.username?"You":u)+(voiceState.peers[u]?" · audio linked":" · connecting")).join("\n")||"Waiting for people…";for(const u of members){if(u===session.username||voiceState.peers[u])continue;if(session.username.localeCompare(u)<0)await createVoicePeer(u,true)}for(const u of Object.keys(voiceState.peers)){if(!members.includes(u))closeVoicePeer(u)}}
+async function createVoicePeer(user,makeOffer){if(!voiceState.stream||voiceState.peers[user])return;const pc=new RTCPeerConnection(voiceRtcConfig);voiceState.peers[user]=pc;voiceState.seenOffers[user]=false;voiceState.stream.getTracks().forEach(t=>pc.addTrack(t,voiceState.stream));pc.onicecandidate=e=>{if(e.candidate)sendVoiceSignal(user,"ice-candidate",e.candidate.toJSON())};pc.ontrack=e=>{let audio=document.getElementById("voice-audio-"+safeVoiceId(user));if(!audio){audio=document.createElement("audio");audio.id="voice-audio-"+safeVoiceId(user);audio.autoplay=true;audio.playsInline=true;$("voice-audios").appendChild(audio)}audio.srcObject=e.streams[0];audio.muted=voiceState.deafened;audio.play().catch(()=>setVoiceState("Click page to enable audio"))};pc.onconnectionstatechange=()=>{if(pc.connectionState==="connected")setVoiceState("Audio connected");if(["failed","disconnected","closed"].includes(pc.connectionState))setVoiceState("Audio: "+pc.connectionState)};if(makeOffer){const offer=await pc.createOffer();await pc.setLocalDescription(offer);await sendVoiceSignal(user,"offer",pc.localDescription.toJSON())}}
+function safeVoiceId(s){return String(s).replace(/[^a-zA-Z0-9_-]/g,"_")}
+async function sendVoiceSignal(to,type,payload){if(!voiceState.roomId)return;await api("voice_signal",{username:session.username,token:session.token,room_id:voiceState.roomId,to,type,payload})}
+async function pollVoiceSignals(){if(!voiceState.roomId)return;const r=await api("voice_poll_signals",{username:session.username,token:session.token,room_id:voiceState.roomId});if(r.status!=="success")return;for(const sig of (r.signals||[])){const user=sig.from;if(sig.type==="offer"){let pc=voiceState.peers[user];if(!pc){await createVoicePeer(user,false);pc=voiceState.peers[user]}if(pc){try{await pc.setRemoteDescription(new RTCSessionDescription(sig.payload));const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await sendVoiceSignal(user,"answer",pc.localDescription.toJSON())}catch(e){setVoiceState("Could not accept audio offer")}}}else if(sig.type==="answer"){const pc=voiceState.peers[user];if(pc&&pc.signalingState==="have-local-offer"){try{await pc.setRemoteDescription(new RTCSessionDescription(sig.payload))}catch(e){}}}else if(sig.type==="ice-candidate"){const pc=voiceState.peers[user];if(pc&&sig.payload){try{await pc.addIceCandidate(new RTCIceCandidate(sig.payload))}catch(e){}}}else if(sig.type==="leave")closeVoicePeer(user)}}
+function closeVoicePeer(user){const pc=voiceState.peers[user];if(pc){pc.close();delete voiceState.peers[user]}const a=$("voice-audio-"+safeVoiceId(user));if(a)a.remove()}
+function toggleVoiceMute(){if(!voiceState.stream)return;voiceState.muted=!voiceState.muted;voiceState.stream.getAudioTracks().forEach(t=>t.enabled=!voiceState.muted);$("voice-mute").textContent=voiceState.muted?"🎙️ Unmute":"🎙️ Mute"}
+function toggleVoiceDeafen(){voiceState.deafened=!voiceState.deafened;document.querySelectorAll("#voice-audios audio").forEach(a=>a.muted=voiceState.deafened);$("voice-deafen").textContent=voiceState.deafened?"🔇 Undeafen":"🔊 Deafen";if(voiceState.deafened)toggleVoiceMuteIfNeeded()}
+function toggleVoiceMuteIfNeeded(){if(!voiceState.stream)return;voiceState.stream.getAudioTracks().forEach(t=>t.enabled=!voiceState.deafened&&!voiceState.muted)}
+async function leaveVoice(hide=true){const room=voiceState.roomId;if(!room)return;for(const u of Object.keys(voiceState.peers))await sendVoiceSignal(u,"leave",{});clearInterval(voiceState.pollTimer);clearInterval(voiceState.memberTimer);Object.keys(voiceState.peers).forEach(closeVoicePeer);if(voiceState.stream)voiceState.stream.getTracks().forEach(t=>t.stop());await api("voice_leave",{username:session.username,token:session.token,room_id:room});voiceState={roomId:null,serverId:"",kind:"",target:"",stream:null,peers:{},pollTimer:null,memberTimer:null,muted:false,deafened:false,seenOffers:{}};if(hide)$("voice-panel").classList.add("hidden")}
+async function checkIncomingCalls(){if(!session||voiceState.roomId)return;const r=await api("voice_incoming",{username:session.username,token:session.token});for(const c of (r.calls||[])){if(confirm(`📞 ${c.from} is calling you on DinkyChat. Answer?`)){await startVoiceRoom(c.room_id,"private",`Call with @${c.from}`,"")}else{Promise.resolve()}}}
+function voiceInfo(){featureResult(`<h3>🎙️ Voice calls</h3><p>Server voice: join a server channel and click <b>Voice</b>. Private calls: click ☎ beside a friend.</p><p style="color:var(--sub);font-size:12px">Allow microphone access when prompted. This first version uses browser WebRTC and a public STUN server; some networks need a TURN relay before calls will connect reliably.</p><button class="small primary" onclick="currentServerId?joinServerVoice():alert('Open a server channel first to join its voice room.')">Join this server's voice</button>`)}
+setInterval(()=>{if(session)checkIncomingCalls()},3000);
 
 window.onload=()=>{
   setupEmoji();applyTheme(localStorage.getItem("dinky_theme")||"midnight");
@@ -270,8 +301,10 @@ function renderSidebar(){
   $("friends").innerHTML="";
   friends.forEach(f=>{
     if(q&&!f.username.toLowerCase().includes(q))return;
-    const b=document.createElement("button");b.className="nav"+(currentChannel===f.username?" active":"");
-    b.textContent=`💬 ${f.username}`;b.onclick=()=>switchChannel(f.username);$("friends").appendChild(b);
+    const wrap=document.createElement("div");wrap.style.cssText="display:flex;gap:3px;align-items:center";
+    const b=document.createElement("button");b.className="nav"+(currentChannel===f.username?" active":"");b.style.flex="1";
+    b.textContent=`💬 ${f.username}`;b.onclick=()=>switchChannel(f.username);wrap.appendChild(b);
+    const call=document.createElement("button");call.className="small";call.title=`Call ${f.username}`;call.textContent="☎";call.style.cssText="background:var(--green);color:#111;padding:6px";call.onclick=()=>startPrivateCall(f.username);wrap.appendChild(call);$("friends").appendChild(wrap);
   });
 }
 function switchChannel(ch,serverId=null){
@@ -281,7 +314,7 @@ function switchChannel(ch,serverId=null){
     $("member").classList.remove("hidden");
     $("header").textContent="🏠 #"+ch.split("_").pop();
     $("actions").innerHTML=`<button class="small" style="background:var(--hover);color:var(--text)" onclick="serverSettings()">⚙ Settings</button>
-      <button class="small primary" onclick="createChannel()">+ Channel</button>
+      <button class="small primary" onclick="createChannel()">+ Channel</button><button class="small" style="background:var(--green);color:#111" onclick="joinServerVoice()">🎙️ Voice</button>
       <button class="small" style="background:var(--red);color:#111" onclick="deleteChannel()">🗑 Delete Channel</button>`;
     renderMembers();
   }else if(ch==="global"){
@@ -569,6 +602,5 @@ document.addEventListener("keydown",e=>{
   }
 });
 </script>
-
-
-</body></html>
+</body>
+</html>
