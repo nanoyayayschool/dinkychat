@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b0b12">
@@ -149,7 +148,7 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
    <article class="card"><div class="icon">📱</div><h3>Actually mobile</h3><p>The interface adapts to smaller screens with mobile navigation, drawers and touch-friendly controls.</p></article>
     <article class="card"><div class="icon">🛍️</div><h3>Cosmetic shop</h3><p>Collect and trade fixed-price cosmetic themes, profile borders and backgrounds with a simple in-app economy.</p></article>
     <article class="card"><div class="icon">🎁</div><h3>Daily rewards</h3><p>Come back for free deterministic cosmetic rewards and keep building your collection.</p></article>
-    <article class="card"><div class="icon">👥</div><h3>Friends & communities</h3><p>Connect with friends, join communities and explore public servers from one place.</p></article>
+    <article class="card"><div class="icon">👥</div><h3>Friends &amp; communities</h3><p>Connect with friends, join communities and explore public servers from one place.</p></article>
   </div>
  </div>
 </section>
@@ -183,18 +182,19 @@ h2{font-size:clamp(36px,5vw,62px);letter-spacing:-3px;margin:10px 0 16px}
 
 <section id="chat-app">
  <div class="chat-head"><div><div class="kicker">try it now</div><h2 style="margin:5px 0;font-size:38px">jump into dinky.</h2></div><button class="secondary" onclick="openChat()">Open in new tab ↗</button></div>
- <div class="chat-frame"><iframe src="DinkyChat_servers_fixed.html" title="Dinky Chat"></iframe></div>
+ <div class="chat-frame"><iframe src="DinkyChat.html" title="Dinky Chat"></iframe></div>
 </section>
+<section class="section" id="update-2"><div class="section-inner"><div class="kicker">DinkyChat 2.0</div><h2>more ways to hang out.</h2><p class="lead">Message reactions, custom statuses, threads, polls, search, server events, richer profiles, achievements and moderation tools are being added in stages. Voice channels need additional real-time audio infrastructure.</p></div></section>
 
 <section class="cta">
- <div class="cta-box"><div class="kicker">ready?</div><h2>your chat. your rules.</h2><p>Make a server. Pick a theme. Invite your people. Then make something ridiculously dinky.</p><div class="actions" style="justify-content:center"><button class="primary" onclick="openChat()">Open Dinky Chat ↗</button><a class="secondary" href="#top">Back to top ↑</a></div></div>
+ <div class="cta-box"><div class="kicker">ready?</div><h2>your chat. your rules.</h2><p>Make a server. Pick a theme. Invite your people. Then make something ridiculously dinky.</p><div class="actions" style="justify-content:center"><button class="primary" onclick="openChat()">Open Dinky Chat ↗</button><a class="secondary" href="DinkyChat.html" download="DinkyChat.html">Download app ↓</a><a class="secondary" href="#top">Back to top ↑</a></div></div>
 </section>
 </main>
 <footer class="footer">dinky chat · made for communities · ✦</footer>
 
 <script>
 function openChat(){
-  window.open("DinkyChat_servers_fixed.html","_blank","noopener");
+  window.open("DinkyChat.html","_blank","noopener");
 }
 function downloadPage(){
   const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});
@@ -203,5 +203,6 @@ function downloadPage(){
   a.click();URL.revokeObjectURL(a.href);
 }
 </script>
-</body>
-</html>
+
+
+</body></html>
