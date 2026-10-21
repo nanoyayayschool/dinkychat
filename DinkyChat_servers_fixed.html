@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en" style="--bg: #0f0f17; --panel: #11111b; --surface: #181825; --input: #1e1e2e; --hover: #313244; --purple: #cba6f7; --blue: #89b4fa; --green: #a6e3a1; --red: #f38ba8; --text: #cdd6f4; --sub: #a6adc8;"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dinky Chat — Web Edition</title>
@@ -63,14 +62,14 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
 @media(max-width:800px){.member{display:none}.sidebar{width:210px;min-width:210px}}
 </style>
 </head>
-<body>
+<body data-theme-kind="solid" style="background-image: none;">
 <div id="auth-screen">
   <div class="auth-card">
     <h1>DINKY CHAT</h1><p>Sign in to start chatting</p>
     <div id="error"></div>
     <div class="form-group"><label>Username</label><input id="user"></div>
     <div class="form-group"><label>Password</label><input id="pass" type="password"></div>
-    <label class="checkbox"><input id="auto" type="checkbox" checked> Auto Login on Startup</label>
+    <label class="checkbox"><input id="auto" type="checkbox" checked=""> Auto Login on Startup</label>
     <button class="btn primary" onclick="login()">Log In</button>
     <button class="btn secondary" onclick="register()">Create Account</button>
   </div>
@@ -96,17 +95,17 @@ hr{border:0;border-top:1px solid #fff1;margin:12px 0}
     </div>
     <div class="sidebar-actions">
       <button class="small" style="background:var(--green);color:#111" onclick="addFriend()">+ Add Friend</button>
-      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style & Settings</button>
+      <button class="small" style="background:var(--hover);color:var(--text)" onclick="themeModal()">🎨 Themes</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="shop()">🛍️ Shop</button><button class="small" style="background:var(--hover);color:var(--text)" onclick="settings()">⚙ Style &amp; Settings</button>
       <button class="small" style="background:var(--red);color:#111" onclick="logout()">🚪 Log Out</button>
     </div>
   </aside>
   <main class="chat">
-    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"></div></header>
+    <header class="header"><div><span id="header" class="header-title"># global-chat</span><span id="conn" class="header-status">● connecting...</span></div><div id="actions" class="actions"><button class="small" onclick="openFeatureHub()">✨ Features</button></div></header>
     <div id="messages" class="messages"></div>
     <div id="replybar" class="replybar hidden"><span id="replytext"></span><b style="color:var(--red);cursor:pointer" onclick="cancelReply()">✕</b></div>
     <div class="inputbar">
       <button class="small" style="background:var(--hover);color:var(--text)" onclick="toggleEmoji()">:-)</button>
-      <div id="emoji" class="emoji hidden"></div>
+      <div id="emoji" class="emoji hidden"><button class="small" style="background: var(--input); color: var(--text);">:)</button><button class="small" style="background: var(--input); color: var(--text);">XD</button><button class="small" style="background: var(--input); color: var(--text);">:P</button><button class="small" style="background: var(--input); color: var(--text);">:D</button><button class="small" style="background: var(--input); color: var(--text);">&lt;3</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:(</button><button class="small" style="background: var(--input); color: var(--text);">B)</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:) </button><button class="small" style="background: var(--input); color: var(--text);">:3</button><button class="small" style="background: var(--input); color: var(--text);">:(</button><button class="small" style="background: var(--input); color: var(--text);">;)</button><button class="small" style="background: var(--input); color: var(--text);">&lt;:0</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:0</button><button class="small" style="background: var(--input); color: var(--text);">&lt;:3</button><button class="small" style="background: var(--input); color: var(--text);">&gt;:3</button><button class="small" style="background: var(--input); color: var(--text);">OwO</button><button class="small" style="background: var(--input); color: var(--text);">UwU</button></div>
       <textarea id="message" rows="1" placeholder="Message..." onkeydown="messageKeydown(event)" oninput="autoGrow(this)"></textarea>
       <button class="small primary" style="padding:0 16px" onclick="send()">Send</button>
     </div>
@@ -187,6 +186,25 @@ function updateShopValueOptions(){const sel=$('itemTheme');if(!$('itemType'))ret
 async function createMyShop(){const r=await api("create_shop",{username:session.username,token:session.token,name:$('shopName').value,description:$('shopDesc').value});if(r.status!=="success")return alert(r.message||"Could not create shop.");alert("Shop saved!");hostShop();}
 async function addMyItem(){const r=await api("add_shop_item",{username:session.username,token:session.token,item_name:$('itemName').value,theme_id:$('itemTheme').value,cosmetic_id:$('itemTheme').value,item_type:$('itemType').value,price:$('itemPrice').value});if(r.status!=="success")return alert(r.message||"Could not add item.");alert("Item added! ✨");shop();}
 function settingsData(){try{return JSON.parse(localStorage.getItem("dinky_settings")||'{"auto_login":true}')}catch{return {auto_login:true}}}
+
+async function reactMessage(msg_id,emoji){const r=await api("toggle_reaction",{username:session.username,token:session.token,msg_id,emoji});if(r.status!=="success")alert(r.message||"Reaction failed.");lastCount=-1;poll()}
+function featureChannel(){let ch=currentChannel;if(ch!=="global"&&!ch.startsWith("server_")&&ch!=="friends_tab")ch=[session.username,currentChannel].sort().join("-");return ch}
+function openFeatureHub(){openModal(`<h2>✨ DinkyChat Features</h2><p class="muted">New community tools. Voice rooms need WebRTC signaling/media infrastructure, so this panel doesn't pretend voice is live yet.</p><div class="row"><button class="small primary" onclick="editStatus()">🟢 Custom status</button><button class="small" onclick="searchMessages()">🔎 Search messages</button><button class="small" onclick="threadPrompt()">🧵 Open thread by message ID</button><button class="small" onclick="makePoll()">📊 Create poll</button></div><div class="row"><button class="small" onclick="showPolls()">📋 View polls</button><button class="small" onclick="makeEvent()">📅 Create event</button><button class="small" onclick="showAchievements()">🏆 Achievements</button></div><div class="row"><button class="small" onclick="editRichProfile()">🪪 Profile details</button><button class="small" onclick="showEvents()">🗓️ Events</button><button class="small" onclick="voiceInfo()">🎙️ Voice channels</button></div><div id="feature-result" style="margin-top:12px"></div>`)}
+async function threadPrompt(){const id=prompt("Message ID to open a thread for:");if(!id)return;const channel=featureChannel();const r=await api("get_thread",{username:session.username,token:session.token,msg_id:id,channel});if(r.status!=="success")return featureResult(`<p>${esc(r.message||"Could not load thread. Message IDs are shown by the server API.")}</p>`);const parent=r.parent||{};const replies=r.replies||[];featureResult(`<h3>🧵 Thread</h3><div class="card"><b>${esc(parent.sender||"message")}</b>: ${esc(parent.text||"")}</div>${replies.map(x=>`<p><b>${esc(x.sender)}</b>: ${esc(x.text)}</p>`).join("")}<textarea id="threadReply" placeholder="Reply in thread…"></textarea><button class="small primary" onclick="sendThreadReply('${esc(id)}','${esc(channel)}')">Send reply</button>`)}
+async function sendThreadReply(id,channel){const el=$("threadReply");if(!el||!el.value.trim())return;const r=await api("send_thread_message",{username:session.username,token:session.token,msg_id:id,channel,text:el.value.trim()});if(r.status!=="success")return alert(r.message||"Could not reply.");threadPromptReload(id,channel)}
+async function threadPromptReload(id,channel){const r=await api("get_thread",{username:session.username,token:session.token,msg_id:id,channel});if(r.status!=="success")return;const parent=r.parent||{};featureResult(`<h3>🧵 Thread</h3><div class="card"><b>${esc(parent.sender||"message")}</b>: ${esc(parent.text||"")}</div>${(r.replies||[]).map(x=>`<p><b>${esc(x.sender)}</b>: ${esc(x.text)}</p>`).join("")}<textarea id="threadReply" placeholder="Reply in thread…"></textarea><button class="small primary" onclick="sendThreadReply('${esc(id)}','${esc(channel)}')">Send reply</button>`)}
+function featureResult(html){const x=$("feature-result");if(x)x.innerHTML=html}
+async function editStatus(){const presence=prompt("Presence: online, idle, dnd, or invisible","online");if(!presence)return;const custom=prompt("Custom status text (optional)","")||"";const r=await api("update_custom_status",{username:session.username,token:session.token,status:presence.toLowerCase(),status_text:custom});featureResult(`<p>${esc(r.message||(r.status==="success"?"Status updated.":"Could not update status."))}</p>`)}
+async function searchMessages(){const q=prompt("Search messages and usernames:");if(!q)return;const r=await api("search_messages",{username:session.username,token:session.token,query:q,channel:"all"});featureResult(`<h3>Search results (${(r.results||[]).length})</h3>`+(r.results||[]).map(m=>`<p><b>${esc(m.sender)}</b> <small>in ${esc(m.channel)}</small><br>${esc(m.text||m.file_name||"")}</p>`).join("")||"<p>No matches.</p>")}
+async function makePoll(){const question=prompt("Poll question:");if(!question)return;const raw=prompt("Options separated by | (at least 2):","Option 1 | Option 2");if(!raw)return;const options=raw.split("|").map(x=>x.trim()).filter(Boolean);const r=await api("create_poll",{username:session.username,token:session.token,channel:featureChannel(),question,options});featureResult(r.status==="success"?`<p>Poll created: <b>${esc(r.poll.question)}</b></p>`:`<p>${esc(r.message||"Could not create poll.")}</p>`)}
+async function showPolls(){const r=await api("get_polls",{username:session.username,token:session.token,channel:featureChannel()});featureResult(`<h3>Polls</h3>`+(r.polls||[]).map(p=>`<div style="padding:8px;border-bottom:1px solid var(--hover)"><b>${esc(p.question)}</b>${p.options.map((o,i)=>`<button class="small" onclick="votePoll('${p.id}',${i})">${esc(o)} (${Object.values(p.votes||{}).filter(v=>v===i).length})</button>`).join("")}</div>`).join("")||"<p>No polls in this channel yet.</p>")}
+async function votePoll(id,option){const r=await api("vote_poll",{username:session.username,token:session.token,poll_id:id,option});if(r.status!=="success")alert(r.message||"Vote failed.");else showPolls()}
+async function makeEvent(){const title=prompt("Event title:");if(!title)return;const when=prompt("Date and time (e.g. 2026-11-01 18:00):");if(!when)return;const description=prompt("Description (optional):","")||"";const r=await api("create_event",{username:session.username,token:session.token,server_id:currentServerId||"",title,when,description});featureResult(`<p>${esc(r.message||(r.status==="success"?"Event created!":"Could not create event."))}</p>`)}
+async function showEvents(){const r=await api("get_events",{username:session.username,token:session.token,server_id:currentServerId||""});featureResult(`<h3>Server events</h3>`+(r.events||[]).map(e=>`<p><b>${esc(e.title)}</b> — ${esc(e.when)}<br>${esc(e.description||"")}</p>`).join("")||"<p>No events scheduled.</p>")}
+async function showAchievements(){const r=await api("get_achievements",{username:session.username,token:session.token});featureResult(`<h3>Achievements</h3>`+(r.achievements||[]).map(a=>`<p>${a.earned?"🏆":"🔒"} <b>${esc(a.name)}</b> ${a.progress!==undefined?`(${a.progress}/${a.goal})`:""}</p>`).join(""))}
+async function editRichProfile(){const pronouns=prompt("Pronouns (optional):","");if(pronouns===null)return;const pinned=prompt("Pinned status (optional):","")||"";const r=await api("update_richer_profile",{username:session.username,token:session.token,pronouns,pinned_status:pinned});featureResult(`<p>${esc(r.message||(r.status==="success"?"Profile details saved.":"Could not save profile."))}</p>`)}
+function voiceInfo(){featureResult("<h3>🎙️ Voice channels</h3><p>Planned: WebRTC voice rooms with signaling, participant presence, mute/deafen and reconnect support. This needs a signaling service and may need a TURN server for reliable connections; no fake join button here.</p>")}
+
 window.onload=()=>{
   setupEmoji();applyTheme(localStorage.getItem("dinky_theme")||"midnight");
   const s=localStorage.getItem("dinky_session"), st=settingsData();
@@ -258,7 +276,7 @@ function renderSidebar(){
 }
 function switchChannel(ch,serverId=null){
   currentChannel=ch;currentServerId=serverId;cancelReply();lastCount=-1;
-  $("actions").innerHTML="";
+  $("actions").innerHTML=`<button class="small" onclick="openFeatureHub()">✨ Features</button>`;
   if(serverId){
     $("member").classList.remove("hidden");
     $("header").textContent="🏠 #"+ch.split("_").pop();
@@ -353,6 +371,10 @@ function renderMessages(msgs){
     const head=document.createElement("div");head.appendChild(a);
     div.innerHTML=reply;div.appendChild(head);
     const body=document.createElement("div");body.className="msgtext";body.textContent=text;div.appendChild(body);
+    if(m.file_url){const link=document.createElement("a");link.href=BASE_URL+m.file_url;link.target="_blank";link.rel="noopener";link.textContent=m.file_name||"Download attachment";link.className="nav";div.appendChild(link);if((m.file_type||"").startsWith("image/")){const im=document.createElement("img");im.src=BASE_URL+m.file_url;im.alt=m.file_name||"Image attachment";im.style.cssText="display:block;max-width:min(420px,100%);max-height:300px;border-radius:10px;margin-top:8px";div.appendChild(im)}}
+    const reactions=m.reactions||{};const reactRow=document.createElement("div");reactRow.style.cssText="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px";
+    Object.entries(reactions).forEach(([emoji,users])=>{const rb=document.createElement("button");rb.className="small";rb.textContent=`${emoji} ${users.length}`;rb.title=users.join(", ");rb.onclick=()=>reactMessage(m.id,emoji);reactRow.appendChild(rb)});
+    const addReact=document.createElement("button");addReact.className="small";addReact.textContent="＋ React";addReact.onclick=()=>{const em=prompt("Choose a reaction: 👍 ❤️ 😂 😮 😢 🎉 👀 🔥 💜 👎","👍");if(em)reactMessage(m.id,em.trim())};reactRow.appendChild(addReact);div.appendChild(reactRow);
     div.oncontextmenu=e=>{e.preventDefault();messageMenu(e,m.sender,text,m.id??i,!!m.is_owner)};$("messages").appendChild(div);
   });
   if(oldScroll>=0 && box.scrollHeight-box.clientHeight-oldScroll<80)box.scrollTop=box.scrollHeight;
@@ -547,5 +569,6 @@ document.addEventListener("keydown",e=>{
   }
 });
 </script>
-</body>
-</html>
+
+
+</body></html>
